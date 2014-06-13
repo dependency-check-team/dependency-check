@@ -1,4 +1,4 @@
-# depcheck
+# dependency-check
 
 checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json
 
@@ -7,8 +7,8 @@ checks which modules you have used in your code and then makes sure they are lis
 ## usage
 
 ```js
-npm install depcheck -g
-depcheck <package.json file or module folder path>
+npm install dependency-check -g
+dependency-check <package.json file or module folder path>
 ```
 
-`depcheck` will exit with code 1 if there are missing dependencies, in additiont to printing them out
+`dependency-check` will exit with code 1 if there are missing dependencies, in additiont to printing them out

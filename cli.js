@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 var path = require('path')
-var depcheck = require('./')
+var check = require('./')
 
 var args = require('minimist')(process.argv.slice(2))
 if (args._.length === 0) {
-  console.log('Usage: depcheck <path to package.json or module folder>')
+  console.log('Usage: dependency-check <path to package.json or module folder>')
   process.exit(1)
 }
-depcheck(args._[0], function(err, results) {
+check(args._[0], function(err, results) {
   if (err) throw err
   if (results.length === 0) {
     console.log('All dependencies are in package.json!')
