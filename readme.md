@@ -15,7 +15,7 @@ the goal of this module is to simply check that all non-relative modules that ge
 
 ## CLI usage
 
-```js
+```
 $ npm install dependency-check -g
 $ dependency-check <package.json file or module folder path>
 
@@ -37,7 +37,7 @@ running `dependency-check ./package.json` will check to make sure that all modul
 
 ### --unused
 
-running `dependency-check ./package.json --extra` will do the inverse of the default missing check and will tell you which modules in your package.json dependencies **were not used** in your code. An alias for `--unused` is `--extra`
+running `dependency-check ./package.json --unused` will do the inverse of the default missing check and will tell you which modules in your package.json dependencies **were not used** in your code. An alias for `--unused` is `--extra`
 
 ### --entry
 
@@ -47,7 +47,7 @@ by default your `main` and `bin` entries from package.json will be parsed, but y
 dependency-check package.json --entry tests.js
 ```
 
-in the above example `tests.js` will get added to the entries that get parsed + checked in addition to the defaults
+in the above example `tests.js` will get added to the entries that get parsed + checked in addition to the defaults. You can specify as many separate `--entry` arguments as you want
 
 ## auto check before every npm publish
 
@@ -68,7 +68,7 @@ now when you do `npm publish` and you have missing dependencies it won't publish
 
 ```
 $ npm publish
-Dependencies not listed in package.json: siblings
+Fail! Dependencies not listed in package.json: siblings
 $ npm install --save siblings
 $ npm publish # works this time
 ```
