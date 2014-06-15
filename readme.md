@@ -4,6 +4,15 @@ checks which modules you have used in your code and then makes sure they are lis
 
 ![dat](http://img.shields.io/badge/Development%20sponsored%20by-dat-green.svg?style=flat)
 
+## how it works
+
+`dependency-check` parses your module code starting from the entry (e.g. `index.js`) and traverses through all relatively required JS files, ultimately producing a list of non-relative modules
+
+* **relative** - e.g. `require('./a-relative-file.js')`, if one of these are encountered the required file will be recursively parsed by the `dependency-check` algorithm
+* **non-relative** - e.g. `require('a-module')`, if one of these are encountered it will get added to the list of dependencies, but subdependencies of the module will not get recursively parsed
+
+the goal of this module is to simply check that all non-relative modules that get `require()`'d are in package.json, which prevents people from getting 'module not found' errors when they install your module that has missing deps which was accidentally published to NPM (happened to me all the time, hence the impetus to write this module).
+
 ## usage
 
 ```js
