@@ -6,21 +6,48 @@ checks which modules you have used in your code and then makes sure they are lis
 
 ## how it works
 
-`dependency-check` parses your module code starting from the entry (e.g. `index.js`) and traverses through all relatively required JS files, ultimately producing a list of non-relative modules
+`dependency-check` parses your module code starting from the default entry files (e.g. `index.js` or `main` and any `bin` commands defined in package.json) and traverses through all relatively required JS files, ultimately producing a list of non-relative modules
 
 * **relative** - e.g. `require('./a-relative-file.js')`, if one of these are encountered the required file will be recursively parsed by the `dependency-check` algorithm
 * **non-relative** - e.g. `require('a-module')`, if one of these are encountered it will get added to the list of dependencies, but subdependencies of the module will not get recursively parsed
 
 the goal of this module is to simply check that all non-relative modules that get `require()`'d are in package.json, which prevents people from getting 'module not found' errors when they install your module that has missing deps which was accidentally published to NPM (happened to me all the time, hence the impetus to write this module).
 
-## usage
+## CLI usage
 
 ```js
-npm install dependency-check -g
-dependency-check <package.json file or module folder path>
+$ npm install dependency-check -g
+$ dependency-check <package.json file or module folder path>
+
+# e.g.
+
+$ dependency-check ./package.json
+Success! All dependencies used in the code are listed in package.json
+$ dependency-check ./package.json --unused
+Success! All dependencies in package.json are used in the code
 ```
 
-`dependency-check` will exit with code 1 if there are missing dependencies, in addition to printing them out
+`dependency-check` exits with code 1 if there are discrepancies, in addition to printing them out
+
+To always exit with code 0 pass `--ignore`
+
+### --missing (default)
+
+running `dependency-check ./package.json` will check to make sure that all modules in your code are listed in your package.json
+
+### --unused
+
+running `dependency-check ./package.json --extra` will do the inverse of the default missing check and will tell you which modules in your package.json dependencies **were not used** in your code. An alias for `--unused` is `--extra`
+
+### --entry
+
+by default your `main` and `bin` entries from package.json will be parsed, but you can add more the list of entries by passing them in as `--entry`, e.g.:
+
+```
+dependency-check package.json --entry tests.js
+```
+
+in the above example `tests.js` will get added to the entries that get parsed + checked in addition to the defaults
 
 ## auto check before every npm publish
 
