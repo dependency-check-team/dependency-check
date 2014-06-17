@@ -5,6 +5,7 @@ var detective = require('detective')
 var async = require('async')
 var builtins = require('builtins')
 var resolve = require('resolve')
+var debug = require('debug')('dependency-check')
 
 module.exports = function(opts, cb) {
   var pkgPath = opts.path
@@ -43,8 +44,9 @@ module.exports.extra = function(pkg, deps) {
 }
 
 function parse(opts, cb) {
+  debug('parsing ' + opts.path)
   // stolen from https://github.com/conradz/browserify-graph
-  var IS_NOT_RELATIVE = /^[^\\\/]+$/
+  var IS_NOT_RELATIVE = /^[^\\\/\.]/
   
   var deps = {}
   
@@ -93,9 +95,10 @@ function parse(opts, cb) {
       return callback(null)
     }
     
-    file = path.resolve(basedir, file)
     if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
-      file = resolve.sync(file, { basedir: basedir })
+      var filename = './' + path.basename(file)
+      debug('resolve', [path.dirname(file), filename])
+      file = resolve.sync(filename, { basedir: path.dirname(file) })
     }
     
     fs.readFile(file, 'utf8', read)
@@ -108,8 +111,20 @@ function parse(opts, cb) {
       var requires = detective(contents)
       var relatives = []
       requires.map(function(req) {
-        if (IS_NOT_RELATIVE.test(req) && builtins.indexOf(req) === -1) { deps[req] = true }
-        else relatives.push(req)
+        var isCore = builtins.indexOf(req) > 0
+        if (IS_NOT_RELATIVE.test(req) && !isCore) {
+          // require('foo/bar') -> require('foo')
+          if (req.indexOf('/') > -1) req = req.split('/')[0]
+          debug('require("' + req + '")' + ' is a dependency')
+          deps[req] = true
+        } else {
+          if (isCore) {
+            debug('require("' + req + '")' + ' is core')
+          } else {
+            debug('require("' + req + '")' + ' is relative')
+            relatives.push(path.resolve(path.dirname(file), req))
+          }
+        }
       })
       
       async.map(relatives, function(name, cb) {
