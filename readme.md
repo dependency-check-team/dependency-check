@@ -72,3 +72,8 @@ Fail! Dependencies not listed in package.json: siblings
 $ npm install --save siblings
 $ npm publish # works this time
 ```
+## protips
+
+- [detective](https://www.npmjs.org/package/detective) is used for parsing `require()` statements, which means it only does **static requires**. this means you should convert things like `var foo = "bar"; require(foo)` to be static, e.g. `require("bar")`
+- you can specify as many entry points as you like with multiple `--entry foo.js` arguments
+
