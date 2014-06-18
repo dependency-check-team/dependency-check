@@ -57,9 +57,9 @@ add this to your `.bash_profile`/`.bashrc`
 # originally from https://gist.github.com/mafintosh/405048d304fbabb830b2
 npm () {
   if [ "$1" = "publish" ]; then
-    dependency-check . &&  $(which npm) "$@"
+    dependency-check . &&  $(which npm) $@
   else
-    $(which npm) "$@"
+    $(which npm) $@
   fi
 }
 ```
