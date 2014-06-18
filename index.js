@@ -113,7 +113,7 @@ function parse(opts, cb) {
       var requires = detective(contents)
       var relatives = []
       requires.map(function(req) {
-        var isCore = builtins.indexOf(req) > 0
+        var isCore = builtins.indexOf(req) > -1
         if (IS_NOT_RELATIVE.test(req) && !isCore) {
           // require('foo/bar') -> require('foo')
           if (req.indexOf('/') > -1) req = req.split('/')[0]
