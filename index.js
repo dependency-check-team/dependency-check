@@ -44,8 +44,6 @@ module.exports.extra = function(pkg, deps) {
 }
 
 function parse(opts, cb) {
-  debug('parsing ' + opts.path)
-  // stolen from https://github.com/conradz/browserify-graph
   var IS_NOT_RELATIVE = /^[^\\\/\.]/
   
   var deps = {}
@@ -55,7 +53,7 @@ function parse(opts, cb) {
   
   var paths = []
   var mainPath = path.resolve(pkg.main || path.join(path.dirname(pkgPath), 'index.js'))
-  paths.push(mainPath)
+  if (fs.existsSync(mainPath)) paths.push(mainPath)
   
   if (pkg.bin) {
     if (typeof pkg.bin === 'string') {
@@ -75,6 +73,10 @@ function parse(opts, cb) {
       paths.push(path.resolve(path.join(path.dirname(pkgPath), entry)))
     })
   }
+  
+  debug('entry paths', paths)
+  
+  if (paths.length === 0) return cb(new Error('No entry paths found'))
   
   async.map(paths, function(file, cb) {
     getDeps(file, path.dirname(pkgPath), cb)

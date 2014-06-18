@@ -11,7 +11,10 @@ if (args._.length === 0) {
 }
 
 check({path: args._[0], entries: args.entry}, function(err, data) {
-  if (err) throw err
+  if (err) {
+    console.error(err.message)
+    return process.exit(1)
+  }
   var pkg = data.package
   var deps = data.used
   var results, errMsg, successMsg
