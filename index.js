@@ -52,6 +52,7 @@ function parse(opts, cb) {
   var pkg = opts.package
   
   var paths = []
+  var seen = []
   var mainPath = path.resolve(pkg.main || path.join(path.dirname(pkgPath), 'index.js'))
   if (fs.existsSync(mainPath)) paths.push(mainPath)
   
@@ -124,7 +125,11 @@ function parse(opts, cb) {
             debug('require("' + req + '")' + ' is core')
           } else {
             debug('require("' + req + '")' + ' is relative')
-            relatives.push(path.resolve(path.dirname(file), req))
+            req = path.resolve(path.dirname(file), req)
+            if (seen.indexOf(req) === -1) {
+              seen.push(req)
+              relatives.push(req)
+            }
           }
         }
       })
