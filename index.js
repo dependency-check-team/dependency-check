@@ -125,9 +125,15 @@ function parse(opts, cb) {
             debug('require("' + req + '")' + ' is core')
           } else {
             debug('require("' + req + '")' + ' is relative')
+            var orig = req
             req = path.resolve(path.dirname(file), req)
             if (seen.indexOf(req) === -1) {
               seen.push(req)
+
+              // dont parse JSON
+              var ext = path.extname(req)
+              if (ext === '.json') return debug('skipping JSON', orig)
+                
               relatives.push(req)
             }
           }
