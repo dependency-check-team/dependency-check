@@ -32,14 +32,20 @@ module.exports.missing = function(pkg, deps) {
   return missing
 }
 
-module.exports.extra = function(pkg, deps) {
+module.exports.extra = function(pkg, deps, options) {
+  options = options || {}
+  
   var missing = []
-  var allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.devDependencies || {}))
+  var allDeps = Object.keys(pkg.dependencies || {})
+  
+  if (!options.excludeDev) {
+    allDeps = allDeps.concat(Object.keys(pkg.devDependencies || {}))
+  }
   
   allDeps.map(function(dep) {
     if (deps.indexOf(dep) === -1) missing.push(dep)
   })
-
+  
   return missing
 }
 

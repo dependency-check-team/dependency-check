@@ -40,6 +40,10 @@ running `dependency-check ./package.json` will check to make sure that all modul
 
 running `dependency-check ./package.json --unused` will do the inverse of the default missing check and will tell you which modules in your package.json dependencies **were not used** in your code. An alias for `--unused` is `--extra`
 
+### --no-dev
+
+running `dependency-check ./package.json --unused --no-dev` won't tell you about which devDependencies in your package.json dependencies that were not used in your code. Only usable with `--unused`
+
 ### --entry
 
 by default your `main` and `bin` entries from package.json will be parsed, but you can add more the list of entries by passing them in as `--entry`, e.g.:
