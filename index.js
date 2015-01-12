@@ -71,7 +71,10 @@ function parse(opts, cb) {
   if (opts.entries) {
     if (typeof opts.entries === 'string') opts.entries = [opts.entries]
     opts.entries.forEach(function(entry) {
-      paths.push(path.resolve(path.join(path.dirname(pkgPath), entry)))
+      entry = path.resolve(path.join(path.dirname(pkgPath), entry))
+      if (paths.indexOf(entry) === -1) {
+        paths.push(entry)
+      }
     })
   }
   
