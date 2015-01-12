@@ -19,7 +19,7 @@ check({path: args._[0], entries: args.entry}, function(err, data) {
   var deps = data.used
   var results, errMsg, successMsg
   if (args.unused || args.extra) {
-    results = check.extra(pkg, deps)
+    results = check.extra(pkg, deps, {excludeDev: args.dev === false})
     errMsg = 'Fail! Modules in package.json not used in code: '
     successMsg = 'Success! All dependencies in package.json are used in the code'
   } else {

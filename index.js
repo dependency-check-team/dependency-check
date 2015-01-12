@@ -32,14 +32,20 @@ module.exports.missing = function(pkg, deps) {
   return missing
 }
 
-module.exports.extra = function(pkg, deps) {
+module.exports.extra = function(pkg, deps, options) {
+  options = options || {}
+  
   var missing = []
-  var allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.devDependencies || {}))
+  var allDeps = Object.keys(pkg.dependencies || {})
+  
+  if (!options.excludeDev) {
+    allDeps = allDeps.concat(Object.keys(pkg.devDependencies || {}))
+  }
   
   allDeps.map(function(dep) {
     if (deps.indexOf(dep) === -1) missing.push(dep)
   })
-
+  
   return missing
 }
 
@@ -71,7 +77,10 @@ function parse(opts, cb) {
   if (opts.entries) {
     if (typeof opts.entries === 'string') opts.entries = [opts.entries]
     opts.entries.forEach(function(entry) {
-      paths.push(path.resolve(path.join(path.dirname(pkgPath), entry)))
+      entry = path.resolve(path.join(path.dirname(pkgPath), entry))
+      if (paths.indexOf(entry) === -1) {
+        paths.push(entry)
+      }
     })
   }
   
