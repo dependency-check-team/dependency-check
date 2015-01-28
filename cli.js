@@ -5,6 +5,10 @@ var check = require('./')
 
 var args = require('minimist')(process.argv.slice(2))
 
+if (args.version) {
+  return console.log(require('./package').version);
+}
+
 if (args._.length === 0) {
   console.log('Usage: dependency-check <path to package.json or module folder>')
   process.exit(1)
