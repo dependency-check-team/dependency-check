@@ -9,8 +9,15 @@ if (args.version) {
   return console.log(require('./package').version);
 }
 
-if (args._.length === 0) {
-  console.log('Usage: dependency-check <path to package.json or module folder>')
+if (args.help || args._.length === 0) {
+  console.log('\nUsage: dependency-check <path to package.json or module folder> [options]')
+
+  console.log('\nOptions:')
+  console.log('\n  --missing (default) -> Check to make sure that all modules in your code are listed in your package.json')
+  console.log('\n  --unused -> The inverse of the --missing check and will tell you which modules in your package.json *were not* used in your code')
+  console.log('\n  --no-dev -> Won\'t tell you about which devDependencies in your package.json dependencies that were not used in your code. Only usable with --unused')
+  console.log('\n  --entry -> By default your main and bin entries from package.json will be parsed, but you can add more the list of entries by passing them in as --entry')
+
   process.exit(1)
 }
 
