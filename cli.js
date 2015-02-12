@@ -6,7 +6,7 @@ var check = require('./')
 var args = require('minimist')(process.argv.slice(2))
 
 if (args.version) {
-  return console.log(require('./package').version);
+  return console.log(require('./package.json').version);
 }
 
 if (args.help || args._.length === 0) {
