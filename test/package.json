@@ -4,6 +4,8 @@
   "dependencies": {
     "async": "*",
     "resolve": "*",
-    "minimist": "*"
+    "minimist": "*",
+    "@scope/test1": "*",
+    "@scope/test2": "*"
   }
 }
