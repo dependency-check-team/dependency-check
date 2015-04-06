@@ -37,13 +37,16 @@ module.exports.extra = function(pkg, deps, options) {
   
   var missing = []
   var allDeps = Object.keys(pkg.dependencies || {})
+  var ignore = options.ignore || [];
+  
+  if (typeof ignore === 'string') ignore = [ignore]
   
   if (!options.excludeDev) {
     allDeps = allDeps.concat(Object.keys(pkg.devDependencies || {}))
   }
   
   allDeps.map(function(dep) {
-    if (deps.indexOf(dep) === -1) missing.push(dep)
+    if (deps.indexOf(dep) === -1 && ignore.indexOf(dep) === -1) missing.push(dep)
   })
   
   return missing

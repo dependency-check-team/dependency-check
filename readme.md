@@ -54,6 +54,10 @@ dependency-check package.json --entry tests.js
 
 in the above example `tests.js` will get added to the entries that get parsed + checked in addition to the defaults. You can specify as many separate `--entry` arguments as you want
 
+### --help
+
+shows above options and all other available options
+
 ## auto check before every npm publish
 
 add this to your `.bash_profile`/`.bashrc`

@@ -7,7 +7,8 @@ module.exports = function (grunt) {
     var options = this.options({
       missing: true,
       unused: true,
-      excludeMissingDev: false,
+      excludeUnusedDev: false,
+      ignoreUnused: [],
       package: '.'
     })
 
@@ -21,7 +22,10 @@ module.exports = function (grunt) {
       var results
 
       if (options.unused) {
-        results = check.extra(pkg, deps, {excludeDev: options.excludeMissingDev})
+        results = check.extra(pkg, deps, {
+          excludeDev: options.excludeUnusedDev || options.excludeMissingDev,
+          ignore: options.ignoreUnused
+        })
         if (results.length !== 0) {
           grunt.log.error('Modules in package.json not used in code: ' + grunt.log.wordlist(results, {color: 'red'}))
         }
