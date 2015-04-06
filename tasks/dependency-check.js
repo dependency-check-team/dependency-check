@@ -12,7 +12,11 @@ module.exports = function (grunt) {
       package: '.'
     })
 
-    check({path: options.package, entries: this.filesSrc}, function(err, data) {
+    check({
+      path: options.package,
+      entries: this.filesSrc,
+      noDefaultEntries: true
+    }, function(err, data) {
       if (err) {
         return grunt.fail.fatal(err)
       }

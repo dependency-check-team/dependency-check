@@ -13,11 +13,11 @@ module.exports = function(opts, cb) {
     if (err && err.code === 'EISDIR') {
       pkgPath = path.join(pkgPath, 'package.json')
       return readPackage(pkgPath, function(err, pkg) {
-      if (err) return cb(err)
-        parse({path: pkgPath, package: pkg, entries: opts.entries}, cb)
+        if (err) return cb(err)
+        parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries}, cb)
       })
     }
-    parse({path: pkgPath, package: pkg, entries: opts.entries}, cb)
+    parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries}, cb)
   })
 }
 
@@ -63,9 +63,9 @@ function parse(opts, cb) {
   var paths = []
   var seen = []
   var mainPath = path.resolve(pkg.main || path.join(path.dirname(pkgPath), 'index.js'))
-  if (fs.existsSync(mainPath)) paths.push(mainPath)
+  if (!opts.noDefaultEntries && fs.existsSync(mainPath)) paths.push(mainPath)
   
-  if (pkg.bin) {
+  if (!opts.noDefaultEntries && pkg.bin) {
     if (typeof pkg.bin === 'string') {
       paths.push(path.resolve(path.join(path.dirname(pkgPath), pkg.bin)))
     } else {

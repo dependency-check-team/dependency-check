@@ -18,6 +18,7 @@ if (args.help || args._.length === 0) {
   console.log('--no-dev              Won\'t tell you about which devDependencies in your package.json dependencies that were not used in your code. Only usable with --unused')
   console.log('--ignore-module, -i   Won\'t tell you about module names passed in as --ignore-module / -i. Only usable with --unused')
   console.log('--entry               By default your main and bin entries from package.json will be parsed, but you can add more the list of entries by passing them in as --entry')
+  console.log('--no-default-entries  Won\'t parse your main and bin entries from package.json will be parsed')
   console.log('--version             Show current version')
   console.log('--ignore              To always exit with code 0 pass --ignore')
   console.log("")
@@ -25,7 +26,11 @@ if (args.help || args._.length === 0) {
   process.exit(1)
 }
 
-check({path: args._[0], entries: args.entry}, function(err, data) {
+check({
+  path: args._[0],
+  entries: args.entry,
+  noDefaultEntries: args['default-entries'] === false
+}, function(err, data) {
   if (err) {
     console.error(err.message)
     return process.exit(1)
