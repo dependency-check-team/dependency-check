@@ -7,12 +7,12 @@ var builtins = require('builtins')
 var resolve = require('resolve')
 var debug = require('debug')('dependency-check')
 
-module.exports = function(opts, cb) {
+module.exports = function (opts, cb) {
   var pkgPath = opts.path
-  readPackage(pkgPath, function(err, pkg) {
+  readPackage(pkgPath, function (err, pkg) {
     if (err && err.code === 'EISDIR') {
       pkgPath = path.join(pkgPath, 'package.json')
-      return readPackage(pkgPath, function(err, pkg) {
+      return readPackage(pkgPath, function (err, pkg) {
         if (err) return cb(err)
         parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries}, cb)
       })
@@ -21,111 +21,111 @@ module.exports = function(opts, cb) {
   })
 }
 
-module.exports.missing = function(pkg, deps) {
+module.exports.missing = function (pkg, deps) {
   var missing = []
   var allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.devDependencies || {}))
-  
-  deps.map(function(used) {
+
+  deps.map(function (used) {
     if (allDeps.indexOf(used) === -1) missing.push(used)
   })
-  
+
   return missing
 }
 
-module.exports.extra = function(pkg, deps, options) {
+module.exports.extra = function (pkg, deps, options) {
   options = options || {}
-  
+
   var missing = []
   var allDeps = Object.keys(pkg.dependencies || {})
-  var ignore = options.ignore || [];
-  
+  var ignore = options.ignore || []
+
   if (typeof ignore === 'string') ignore = [ignore]
-  
+
   if (!options.excludeDev) {
     allDeps = allDeps.concat(Object.keys(pkg.devDependencies || {}))
   }
-  
-  allDeps.map(function(dep) {
+
+  allDeps.map(function (dep) {
     if (deps.indexOf(dep) === -1 && ignore.indexOf(dep) === -1) missing.push(dep)
   })
-  
+
   return missing
 }
 
-function parse(opts, cb) {
+function parse (opts, cb) {
   var IS_NOT_RELATIVE = /^[^\\\/\.]/
-  
+
   var deps = {}
-  
+
   var pkgPath = opts.path
   var pkg = opts.package
-  
+
   var paths = []
   var seen = []
   var mainPath = path.resolve(pkg.main || path.join(path.dirname(pkgPath), 'index.js'))
   if (!opts.noDefaultEntries && fs.existsSync(mainPath)) paths.push(mainPath)
-  
+
   if (!opts.noDefaultEntries && pkg.bin) {
     if (typeof pkg.bin === 'string') {
       paths.push(path.resolve(path.join(path.dirname(pkgPath), pkg.bin)))
     } else {
-      Object.keys(pkg.bin).forEach(function(cmdName) {
+      Object.keys(pkg.bin).forEach(function (cmdName) {
         var cmd = pkg.bin[cmdName]
         paths.push(path.resolve(path.join(path.dirname(pkgPath), cmd)))
       })
     }
   }
-  
+
   // pass in custom additional entries e.g. ['./test.js']
   if (opts.entries) {
     if (typeof opts.entries === 'string') opts.entries = [opts.entries]
-    opts.entries.forEach(function(entry) {
+    opts.entries.forEach(function (entry) {
       entry = path.resolve(path.join(path.dirname(pkgPath), entry))
       if (paths.indexOf(entry) === -1) {
         paths.push(entry)
       }
     })
   }
-  
+
   debug('entry paths', paths)
-  
+
   if (paths.length === 0) return cb(new Error('No entry paths found'))
-  
-  async.map(paths, function(file, cb) {
+
+  async.map(paths, function (file, cb) {
     getDeps(file, path.dirname(pkgPath), cb)
-  }, function(err, allDeps) {
+  }, function (err, allDeps) {
     if (err) return cb(err)
     var used = {}
     // merge all deps into one unique list
-    allDeps.forEach(function(deps) {
-      Object.keys(deps).forEach(function(dep) {
+    allDeps.forEach(function (deps) {
+      Object.keys(deps).forEach(function (dep) {
         used[dep] = true
       })
     })
     cb(null, {package: pkg, used: Object.keys(used)})
   })
-  
-  function getDeps(file, basedir, callback) {
+
+  function getDeps (file, basedir, callback) {
     if (IS_NOT_RELATIVE.test(file)) {
       return callback(null)
     }
-    
+
     if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
       var filename = './' + path.basename(file)
       debug('resolve', [path.dirname(file), filename])
       file = resolve.sync(filename, { basedir: path.dirname(file) })
     }
-    
+
     fs.readFile(file, 'utf8', read)
-    
-    function read(err, contents) {
+
+    function read (err, contents) {
       if (err) {
         return callback(err)
       }
-      
+
       var requires = detective(contents)
       var relatives = []
-      requires.map(function(req) {
+      requires.map(function (req) {
         var isCore = builtins.indexOf(req) > -1
         if (IS_NOT_RELATIVE.test(req) && !isCore) {
           // require('foo/bar') -> require('foo')
@@ -146,19 +146,19 @@ function parse(opts, cb) {
               // dont parse JSON
               var ext = path.extname(req)
               if (ext === '.json') return debug('skipping JSON', orig)
-                
+
               relatives.push(req)
             }
           }
         }
       })
-      
-      async.map(relatives, function(name, cb) {
+
+      async.map(relatives, function (name, cb) {
         getDeps(name, basedir, cb)
       }, done)
     }
-    
-    function done(err) {
+
+    function done (err) {
       if (err) {
         return callback(err)
       }

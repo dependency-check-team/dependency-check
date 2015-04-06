@@ -7,7 +7,7 @@
     "dependency-check": "cli.js"
   },
   "scripts": {
-    "test": "node cli.js test/"
+    "test": "standard && node cli.js test/"
   },
   "author": "max ogden",
   "license": "BSD",
@@ -19,6 +19,9 @@
     "read-package-json": "^1.2.2",
     "resolve": "^0.7.1",
     "debug": "1.0.2"
+  },
+  "devDependencies": {
+    "standard": "^3.3.2"
   },
   "directories": {
     "test": "test"

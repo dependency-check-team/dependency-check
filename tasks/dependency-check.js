@@ -16,7 +16,7 @@ module.exports = function (grunt) {
       path: options.package,
       entries: this.filesSrc,
       noDefaultEntries: true
-    }, function(err, data) {
+    }, function (err, data) {
       if (err) {
         return grunt.fail.fatal(err)
       }

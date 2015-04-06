@@ -5,6 +5,8 @@ checks which modules you have used in your code and then makes sure they are lis
 [![dat](http://img.shields.io/badge/Development%20sponsored%20by-dat-green.svg?style=flat)](http://dat-data.com/)
 [![Travis](http://img.shields.io/travis/maxogden/dependency-check.svg?style=flat)](https://travis-ci.org/maxogden/dependency-check)
 
+[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+
 ## how it works
 
 `dependency-check` parses your module code starting from the default entry files (e.g. `index.js` or `main` and any `bin` commands defined in package.json) and traverses through all relatively required JS files, ultimately producing a list of non-relative modules
