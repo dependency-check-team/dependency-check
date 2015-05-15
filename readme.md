@@ -38,13 +38,17 @@ To always exit with code 0 pass `--ignore`
 
 running `dependency-check ./package.json` will check to make sure that all modules in your code are listed in your package.json
 
-### --unused
+### --unused, --extra
 
-running `dependency-check ./package.json --unused` will do the inverse of the default missing check and will tell you which modules in your package.json dependencies **were not used** in your code. An alias for `--unused` is `--extra`
+running `dependency-check ./package.json --unused` will do the inverse of the default missing check and will tell you which modules in your package.json dependencies **were not used** in your code
 
 ### --no-dev
 
-running `dependency-check ./package.json --unused --no-dev` won't tell you about which devDependencies in your package.json dependencies that were not used in your code. Only usable with `--unused`
+running `dependency-check ./package.json --unused --no-dev` will not tell you if any devDependencies in your package.json were not used in your code. Only usable with `--unused`
+
+### --ignore-module, -i
+
+running `dependency-check ./package.json --unused --ignore-module foo` will not tell you if the `foo` module was not used in your code. You can specify as many separate `--ignore-module` arguments as you want. Only usable with `--unused`
 
 ### --entry
 
@@ -55,6 +59,10 @@ dependency-check package.json --entry tests.js
 ```
 
 in the above example `tests.js` will get added to the entries that get parsed + checked in addition to the defaults. You can specify as many separate `--entry` arguments as you want
+
+### --no-default-entries
+
+running `dependency-check package.json --no-default-entries --entry tests.js` won't parse any entries other than `tests.js`.  None of the entries from your package.json `main` and `bin` will be parsed
 
 ### --help
 
