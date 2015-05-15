@@ -8,6 +8,7 @@ module.exports = function (grunt) {
       missing: true,
       unused: true,
       excludeUnusedDev: false,
+      noDefaultEntries: true,
       ignoreUnused: [],
       package: '.'
     })
@@ -15,7 +16,7 @@ module.exports = function (grunt) {
     check({
       path: options.package,
       entries: this.filesSrc,
-      noDefaultEntries: true
+      noDefaultEntries: options.noDefaultEntries
     }, function (err, data) {
       if (err) {
         return grunt.fail.fatal(err)
