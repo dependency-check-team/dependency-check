@@ -14,10 +14,10 @@ module.exports = function (opts, cb) {
       pkgPath = path.join(pkgPath, 'package.json')
       return readPackage(pkgPath, function (err, pkg) {
         if (err) return cb(err)
-        parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries}, cb)
+        parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
       })
     }
-    parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries}, cb)
+    parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
   })
 }
 
@@ -62,6 +62,7 @@ function parse (opts, cb) {
 
   var paths = []
   var seen = []
+  var core = []
   var mainPath = path.resolve(pkg.main || path.join(path.dirname(pkgPath), 'index.js'))
   if (!opts.noDefaultEntries && fs.existsSync(mainPath)) paths.push(mainPath)
 
@@ -102,6 +103,8 @@ function parse (opts, cb) {
         used[dep] = true
       })
     })
+    if (opts.builtins) return cb(null, {package: pkg, used: Object.keys(used), builtins: core})
+
     cb(null, {package: pkg, used: Object.keys(used)})
   })
 
@@ -136,6 +139,9 @@ function parse (opts, cb) {
         } else {
           if (isCore) {
             debug('require("' + req + '")' + ' is core')
+            if (core.indexOf(req) === -1) {
+              core.push(req)
+            }
           } else {
             debug('require("' + req + '")' + ' is relative')
             var orig = req
