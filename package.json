@@ -10,7 +10,6 @@
     "test": "standard && node cli.js test/"
   },
   "author": "max ogden",
-  "license": "BSD",
   "dependencies": {
     "async": "^0.9.0",
     "builtins": "^1.0.0",
@@ -28,10 +27,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/maxogden/dependency-check.git"
+    "url": "git+https://github.com/maxogden/dependency-check.git"
   },
   "bugs": {
     "url": "https://github.com/maxogden/dependency-check/issues"
   },
-  "homepage": "https://github.com/maxogden/dependency-check"
+  "homepage": "https://github.com/maxogden/dependency-check",
+  "license": "BSD-3-Clause"
 }
