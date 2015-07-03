@@ -90,35 +90,7 @@ $ npm publish # works this time
 
 ## grunt usage
 
-`dependency-check` also contains a small `grunt` task to ease integration into existing [grunt](http://gruntjs.com/) setups
-
-install `dependency-check` as a development dependency:
-
-```
-$ npm install dependency-check --save-dev
-```
-
-then load the task:
-
-```javascript
-grunt.loadNpmTasks('dependency-check');
-```
-
-then configure a task or sub-task, example values are the defaults:
-
-```javascript
-'dependency-check': {
-  files: ['lib/**/*.js'],     // required grunt attribute, same as --entry
-  options: {
-    missing: true,            // same as --missing
-    unused: true,             // same as --unused
-    excludeUnusedDev: false,  // same as --no-dev
-    noDefaultEntries: true,   // same as --no-default-entries
-    ignoreUnused: [],         // same as --ignore-module
-    package: '.'              // package.json file or module folder path
-  }
-}
-```
+See [grunt-dependency-check](https://github.com/sindresorhus/grunt-dependency-check).
 
 ## protips
 
