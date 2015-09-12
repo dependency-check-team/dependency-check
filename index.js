@@ -6,6 +6,7 @@ var async = require('async')
 var builtins = require('builtins')
 var resolve = require('resolve')
 var debug = require('debug')('dependency-check')
+var isRelative = require('is-relative')
 
 module.exports = function (opts, cb) {
   var pkgPath = opts.path
@@ -52,9 +53,11 @@ module.exports.extra = function (pkg, deps, options) {
   return missing
 }
 
-function parse (opts, cb) {
-  var IS_NOT_RELATIVE = /^[^\\\/\.]/
+function isNotRelative (file) {
+  return isRelative(file) && file[0] !== '.'
+}
 
+function parse (opts, cb) {
   var deps = {}
 
   var pkgPath = opts.path
@@ -109,7 +112,7 @@ function parse (opts, cb) {
   })
 
   function getDeps (file, basedir, callback) {
-    if (IS_NOT_RELATIVE.test(file)) {
+    if (isNotRelative(file)) {
       return callback(null)
     }
 
@@ -130,7 +133,7 @@ function parse (opts, cb) {
       var relatives = []
       requires.map(function (req) {
         var isCore = builtins.indexOf(req) > -1
-        if (IS_NOT_RELATIVE.test(req) && !isCore) {
+        if (isNotRelative(req) && !isCore) {
           // require('foo/bar') -> require('foo')
           if (req[0] !== '@' && req.indexOf('/') > -1) req = req.split('/')[0]
           else if (req[0] === '@') req = req.split('/').slice(0, 2).join('/')
