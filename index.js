@@ -15,10 +15,10 @@ module.exports = function (opts, cb) {
       pkgPath = path.join(pkgPath, 'package.json')
       return readPackage(pkgPath, function (err, pkg) {
         if (err) return cb(err)
-        parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
+        parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins, transformer: opts.transformer}, cb)
       })
     }
-    parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
+    parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins, transformer: opts.transformer}, cb)
   })
 }
 
@@ -122,7 +122,23 @@ function parse (opts, cb) {
       file = resolve.sync(filename, { basedir: path.dirname(file) })
     }
 
-    fs.readFile(file, 'utf8', read)
+    if (opts.transformer) {
+    	var cmd = opts.transformer.split(" ") ; 
+    	var args = cmd.slice(1).map(function(a){ return a=="$$"?file:a }) ;
+    	console.log(cmd[0],args);
+    	var p = require('child_process').spawn(cmd[0],args) ;
+    	var output = "" ;
+    	p.stdout.on('data',function(data){
+    		output += data.toString() ;
+    	}) ;
+    	p.on('close',function(){
+    		read(null,output) ;
+    	}) ;
+    	p.on('error',read) ;
+    	p.stderr.on('stderr',read) ;
+    } else {
+        fs.readFile(file, 'utf8', read)
+    }
 
     function read (err, contents) {
       if (err) {

@@ -21,6 +21,7 @@ if (args.help || args._.length === 0) {
   console.log("--no-default-entries  Won't parse your main and bin entries from package.json will be parsed")
   console.log('--version             Show current version')
   console.log('--ignore              To always exit with code 0 pass --ignore')
+  console.log('--transformer=<cmd>   Transform each file with the program "cmd". The current filename is available as $$')
   console.log('')
 
   process.exit(1)
@@ -29,7 +30,8 @@ if (args.help || args._.length === 0) {
 check({
   path: args._[0],
   entries: args.entry,
-  noDefaultEntries: args['default-entries'] === false
+  noDefaultEntries: args['default-entries'] === false,
+  transformer:args.transformer
 }, function (err, data) {
   if (err) {
     console.error(err.message)
