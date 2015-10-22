@@ -125,7 +125,6 @@ function parse (opts, cb) {
     if (opts.transformer) {
     	var cmd = opts.transformer.split(" ") ; 
     	var args = cmd.slice(1).map(function(a){ return a=="$$"?file:a }) ;
-    	console.log(cmd[0],args);
     	var p = require('child_process').spawn(cmd[0],args) ;
     	var output = "" ;
     	p.stdout.on('data',function(data){
