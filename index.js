@@ -7,6 +7,7 @@ var builtins = require('builtins')
 var resolve = require('resolve')
 var debug = require('debug')('dependency-check')
 var isRelative = require('is-relative')
+var exec = require('child_process').exec
 
 module.exports = function (opts, cb) {
   var pkgPath = opts.path
@@ -15,10 +16,10 @@ module.exports = function (opts, cb) {
       pkgPath = path.join(pkgPath, 'package.json')
       return readPackage(pkgPath, function (err, pkg) {
         if (err) return cb(err)
-        parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
+        parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins, transformer: opts.transformer}, cb)
       })
     }
-    parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
+    parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins, transformer: opts.transformer}, cb)
   })
 }
 
@@ -122,7 +123,13 @@ function parse (opts, cb) {
       file = resolve.sync(filename, { basedir: path.dirname(file) })
     }
 
-    fs.readFile(file, 'utf8', read)
+    if (opts.transformer) {
+      exec(opts.transformer.replace(/\$\$/g, file), function (error, stdout, stderr) {
+        read(error, stdout.toString())
+      })
+    } else {
+      fs.readFile(file, 'utf8', read)
+    }
 
     function read (err, contents) {
       if (err) {

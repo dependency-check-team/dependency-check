@@ -64,6 +64,12 @@ in the above example `tests.js` will get added to the entries that get parsed + 
 
 running `dependency-check package.json --no-default-entries --entry tests.js` won't parse any entries other than `tests.js`.  None of the entries from your package.json `main` and `bin` will be parsed
 
+### --transformer=`command-line`
+
+runs the specified command line before checking each file, so that you can run any transpilers, such as nodent, coffeescript, babel, etc. and check their dependencies. With the command line, the special sequence `$$` is replaced with the full path of the current file being analysed. For example to change every file to lower-case before analysis, use
+
+	dependency-check --transformer='tr A-Z a-z < $$'
+
 ### --help
 
 shows above options and all other available options
