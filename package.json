@@ -1,13 +1,13 @@
 {
   "name": "dependency-check",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json",
   "main": "index.js",
   "bin": {
     "dependency-check": "cli.js"
   },
   "scripts": {
-    "test": "standard && node cli.js test/"
+    "test": "standard && node cli.js test/ && ./cli.js --transformer='tr A-Z a-z <$$' LOUD-test/"
   },
   "author": "max ogden",
   "dependencies": {
