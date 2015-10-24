@@ -7,6 +7,7 @@ var builtins = require('builtins')
 var resolve = require('resolve')
 var debug = require('debug')('dependency-check')
 var isRelative = require('is-relative')
+var exec = require('child_process').exec
 
 module.exports = function (opts, cb) {
   var pkgPath = opts.path
@@ -123,20 +124,11 @@ function parse (opts, cb) {
     }
 
     if (opts.transformer) {
-    	var cmd = opts.transformer.split(" ") ; 
-    	var args = cmd.slice(1).map(function(a){ return a=="$$"?file:a }) ;
-    	var p = require('child_process').spawn(cmd[0],args) ;
-    	var output = "" ;
-    	p.stdout.on('data',function(data){
-    		output += data.toString() ;
-    	}) ;
-    	p.on('close',function(){
-    		read(null,output) ;
-    	}) ;
-    	p.on('error',read) ;
-    	p.stderr.on('stderr',read) ;
+      exec(opts.transformer.replace(/\$\$/g, file), function (error, stdout, stderr) {
+        read(error, stdout.toString())
+      })
     } else {
-        fs.readFile(file, 'utf8', read)
+      fs.readFile(file, 'utf8', read)
     }
 
     function read (err, contents) {

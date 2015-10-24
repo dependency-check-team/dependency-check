@@ -31,7 +31,7 @@ check({
   path: args._[0],
   entries: args.entry,
   noDefaultEntries: args['default-entries'] === false,
-  transformer:args.transformer
+  transformer: args.transformer
 }, function (err, data) {
   if (err) {
     console.error(err.message)
