@@ -7,13 +7,13 @@
     "dependency-check": "cli.js"
   },
   "scripts": {
-    "test": "standard && node cli.js test/"
+    "test": "standard && node cli.js test/ && node cli.js test/ --extra"
   },
   "author": "max ogden",
   "dependencies": {
     "async": "^0.9.0",
     "builtins": "^1.0.0",
-    "detective": "^4.0.0",
+    "detect-import-require": "^1.1.0",
     "minimist": "^0.1.0",
     "read-package-json": "^1.2.2",
     "resolve": "^0.7.1",

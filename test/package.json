@@ -6,6 +6,7 @@
     "resolve": "*",
     "minimist": "*",
     "@scope/test1": "*",
-    "@scope/test2": "*"
+    "@scope/test2": "*",
+    "test3": "*"
   }
 }

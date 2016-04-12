@@ -1,3 +1,5 @@
+import './imported'
+
 module.exports = {}
 require('async')
 

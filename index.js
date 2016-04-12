@@ -1,7 +1,7 @@
 var path = require('path')
 var fs = require('fs')
 var readPackage = require('read-package-json')
-var detective = require('detective')
+var detect = require('detect-import-require')
 var async = require('async')
 var builtins = require('builtins')
 var resolve = require('resolve')
@@ -129,7 +129,7 @@ function parse (opts, cb) {
         return callback(err)
       }
 
-      var requires = detective(contents)
+      var requires = detect(contents)
       var relatives = []
       requires.map(function (req) {
         var isCore = builtins.indexOf(req) > -1
