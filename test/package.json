@@ -4,6 +4,7 @@
   "dependencies": {
     "async": "*",
     "resolve": "*",
+    "lodash": "*",
     "minimist": "*",
     "@scope/test1": "*",
     "@scope/test2": "*"
