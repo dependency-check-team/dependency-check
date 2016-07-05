@@ -3,3 +3,7 @@ node_js:
   - '0.10'
   - '0.12'
   - 'iojs'
+  - '5'
+  - '6'
+  - 'stable'
+sudo: false
