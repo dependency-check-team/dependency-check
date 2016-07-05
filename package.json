@@ -7,7 +7,7 @@
     "dependency-check": "cli.js"
   },
   "scripts": {
-    "test": "standard && node cli.js test/"
+    "test": "standard && node cli.js test/ && node cli.js . && node cli.js . --extra --no-dev"
   },
   "author": "max ogden",
   "dependencies": {
