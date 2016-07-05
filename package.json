@@ -15,7 +15,7 @@
     "builtins": "^1.0.0",
     "detective": "^4.0.0",
     "minimist": "^0.1.0",
-    "read-package-json": "^1.2.2",
+    "read-package-json": "^2.0.4",
     "resolve": "^0.7.1",
     "is-relative": "^0.2.1",
     "debug": "1.0.2"
