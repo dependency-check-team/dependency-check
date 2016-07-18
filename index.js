@@ -24,7 +24,7 @@ module.exports = function (opts, cb) {
 
 module.exports.missing = function (pkg, deps) {
   var missing = []
-  var allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.devDependencies || {}))
+  var allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.devDependencies || {})).concat(Object.keys(pkg.peerDependencies || {}))
 
   deps.map(function (used) {
     if (allDeps.indexOf(used) === -1) missing.push(used)
