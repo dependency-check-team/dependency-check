@@ -1,6 +1,6 @@
 {
   "name": "dependency-check",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json",
   "main": "index.js",
   "bin": {
