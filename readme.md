@@ -60,6 +60,12 @@ dependency-check package.json --entry tests.js
 
 in the above example `tests.js` will get added to the entries that get parsed + checked in addition to the defaults. You can specify as many separate `--entry` arguments as you want
 
+you can also instead add additional entries directly after your package definition, like:
+
+```
+dependency-check package.json tests.js
+```
+
 ### --no-default-entries
 
 running `dependency-check package.json --no-default-entries --entry tests.js` won't parse any entries other than `tests.js`.  None of the entries from your package.json `main` and `bin` will be parsed
@@ -124,4 +130,3 @@ then configure a task or sub-task, example values are the defaults:
 
 - [detective](https://www.npmjs.org/package/detective) is used for parsing `require()` statements, which means it only does **static requires**. this means you should convert things like `var foo = "bar"; require(foo)` to be static, e.g. `require("bar")`
 - you can specify as many entry points as you like with multiple `--entry foo.js` arguments
-

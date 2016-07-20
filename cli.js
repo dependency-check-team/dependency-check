@@ -10,7 +10,7 @@ if (args.version) {
 }
 
 if (args.help || args._.length === 0) {
-  console.log('\nUsage: dependency-check <path to package.json or module folder> <options>')
+  console.log('\nUsage: dependency-check <path to package.json or module folder> <additional entries to add> <options>')
 
   console.log('\nOptions:')
   console.log('--missing (default)   Check to make sure that all modules in your code are listed in your package.json')
@@ -27,8 +27,8 @@ if (args.help || args._.length === 0) {
 }
 
 check({
-  path: args._[0],
-  entries: args.entry,
+  path: args._.shift(),
+  entries: args._.concat(args.entry || []),
   noDefaultEntries: args['default-entries'] === false
 }, function (err, data) {
   if (err) {
