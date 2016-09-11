@@ -22,22 +22,36 @@ module.exports = function (opts, cb) {
   })
 }
 
-module.exports.missing = function (pkg, deps) {
+module.exports.missing = function (pkg, deps, options) {
   var missing = []
-  var allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.devDependencies || {})).concat(Object.keys(pkg.peerDependencies || {}))
+  var config = configure(pkg, options)
 
   deps.map(function (used) {
-    if (allDeps.indexOf(used) === -1) missing.push(used)
+    if (config.allDeps.indexOf(used) === -1 && config.ignore.indexOf(used) === -1) {
+      missing.push(used)
+    }
   })
 
   return missing
 }
 
 module.exports.extra = function (pkg, deps, options) {
+  var missing = []
+  var config = configure(pkg, options)
+
+  config.allDeps.map(function (dep) {
+    if (deps.indexOf(dep) === -1 && config.ignore.indexOf(dep) === -1) {
+      missing.push(dep)
+    }
+  })
+
+  return missing
+}
+
+function configure (pkg, options) {
   options = options || {}
 
-  var missing = []
-  var allDeps = Object.keys(pkg.dependencies || {})
+  var allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.peerDependencies || {}))
   var ignore = options.ignore || []
 
   if (typeof ignore === 'string') ignore = [ignore]
@@ -46,11 +60,10 @@ module.exports.extra = function (pkg, deps, options) {
     allDeps = allDeps.concat(Object.keys(pkg.devDependencies || {}))
   }
 
-  allDeps.map(function (dep) {
-    if (deps.indexOf(dep) === -1 && ignore.indexOf(dep) === -1) missing.push(dep)
-  })
-
-  return missing
+  return {
+    allDeps: allDeps,
+    ignore: ignore
+  }
 }
 
 function isNotRelative (file) {
