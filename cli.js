@@ -2,7 +2,19 @@
 
 var check = require('./')
 
-var args = require('minimist')(process.argv.slice(2))
+var args = require('minimist')(process.argv.slice(2), {
+  default: {
+    missing: false,
+    extra: false,
+    dev: true,
+    'default-entries': true
+  },
+  boolean: ['missing', 'extra', 'dev', 'version', 'ignore', 'default-entries'],
+  alias: {
+    extra: 'unused',
+    'ignore-module': 'i'
+  }
+})
 
 if (args.version) {
   console.log(require('./package.json').version)
@@ -29,7 +41,7 @@ if (args.help || args._.length === 0) {
 check({
   path: args._.shift(),
   entries: args._.concat(args.entry || []),
-  noDefaultEntries: args['default-entries'] === false
+  noDefaultEntries: !args['default-entries']
 }, function (err, data) {
   if (err) {
     console.error(err.message)
@@ -37,24 +49,27 @@ check({
   }
   var pkg = data.package
   var deps = data.used
-  var results, errMsg, successMsg
-  if (args.unused || args.extra) {
-    results = check.extra(pkg, deps, {
-      excludeDev: args.dev === false,
-      ignore: [].concat(args['ignore-module'] || [], args.i || [])
+  var failed = 0
+  if (args.extra) {
+    var extras = check.extra(pkg, deps, {
+      excludeDev: !args.dev,
+      ignore: [].concat(args.i || [])
     })
-    errMsg = 'Fail! Modules in package.json not used in code: '
-    successMsg = 'Success! All dependencies in package.json are used in the code'
-  } else {
-    results = check.missing(pkg, deps)
-    errMsg = 'Fail! Dependencies not listed in package.json: '
-    successMsg = 'Success! All dependencies used in the code are listed in package.json'
+    failed += extras.length
+    if (extras.length) {
+      console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
+    } else {
+      console.log('Success! All dependencies in package.json are used in the code')
+    }
   }
-  if (results.length === 0) {
-    console.log(successMsg)
-    process.exit(0)
-  } else {
-    console.error(errMsg + results.join(', '))
-    process.exit(args.ignore ? 0 : 1)
+  if (args.missing || !args.extra) {
+    var missing = check.missing(pkg, deps)
+    failed += missing.length
+    if (missing.length) {
+      console.error('Fail! Dependencies not listed in package.json: ' + missing.join(', '))
+    } else {
+      console.log('Success! All dependencies used in the code are listed in package.json')
+    }
   }
+  process.exit(args.ignore || !failed ? 0 : 1)
 })
