@@ -50,11 +50,12 @@ check({
   var pkg = data.package
   var deps = data.used
   var failed = 0
+  var options = {
+    excludeDev: args.dev === false,
+    ignore: [].concat(args.i || [])
+  }
   if (args.extra) {
-    var extras = check.extra(pkg, deps, {
-      excludeDev: !args.dev,
-      ignore: [].concat(args.i || [])
-    })
+    var extras = check.extra(pkg, deps, options)
     failed += extras.length
     if (extras.length) {
       console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
@@ -63,7 +64,7 @@ check({
     }
   }
   if (args.missing || !args.extra) {
-    var missing = check.missing(pkg, deps)
+    var missing = check.missing(pkg, deps, options)
     failed += missing.length
     if (missing.length) {
       console.error('Fail! Dependencies not listed in package.json: ' + missing.join(', '))
