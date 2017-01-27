@@ -11,13 +11,6 @@ var isRelative = require('is-relative')
 module.exports = function (opts, cb) {
   var pkgPath = opts.path
   readPackage(pkgPath, function (err, pkg) {
-    var baseOpts = {
-      entries: opts.entries,
-      noDefaultEntries: opts.noDefaultEntries,
-      builtins: opts.builtins,
-      extensions: opts.extensions,
-      detective: opts.detective
-    }
     if (err && err.code === 'EISDIR') {
       pkgPath = path.join(pkgPath, 'package.json')
       return readPackage(pkgPath, function (err, pkg) {
