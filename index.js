@@ -1,7 +1,6 @@
 var path = require('path')
 var fs = require('fs')
 var readPackage = require('read-package-json')
-var detective = require('detective')
 var async = require('async')
 var builtins = require('builtins')
 var resolve = require('resolve')
@@ -93,9 +92,13 @@ function parse (opts, cb) {
   var pkg = opts.package
 
   var extensions = opts.extensions
-  var configuredDetective = opts.detective
-    ? (typeof opts.detective === 'string' ? require(opts.detective) : opts.detective)
-    : detective
+  var configuredDetective
+
+  try {
+    configuredDetective = opts.detective
+      ? (typeof opts.detective === 'string' ? require(opts.detective) : opts.detective)
+      : require('detective')
+  } catch (e) {}
 
   if (!configuredDetective || typeof configuredDetective !== 'function') return cb(new Error('Found no valid detective function'))
 
