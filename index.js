@@ -92,15 +92,15 @@ function parse (opts, cb) {
   var pkg = opts.package
 
   var extensions = opts.extensions
-  var configuredDetective
+  var detective
 
   try {
-    configuredDetective = opts.detective
+    detective = opts.detective
       ? (typeof opts.detective === 'string' ? require(opts.detective) : opts.detective)
       : require('detective')
   } catch (e) {}
 
-  if (!configuredDetective || typeof configuredDetective !== 'function') return cb(new Error('Found no valid detective function'))
+  if (!detective || typeof detective !== 'function') return cb(new Error('Found no valid detective function'))
 
   var paths = []
   var seen = []
@@ -168,7 +168,7 @@ function parse (opts, cb) {
         return callback(err)
       }
 
-      var requires = configuredDetective(contents)
+      var requires = detective(contents)
       var relatives = []
       requires.map(function (req) {
         var isCore = builtins.indexOf(req) > -1
