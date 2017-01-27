@@ -11,14 +11,21 @@ var isRelative = require('is-relative')
 module.exports = function (opts, cb) {
   var pkgPath = opts.path
   readPackage(pkgPath, function (err, pkg) {
+    var baseOpts = {
+      entries: opts.entries,
+      noDefaultEntries: opts.noDefaultEntries,
+      builtins: opts.builtins,
+      extensions: opts.extensions,
+      detective: opts.detective
+    }
     if (err && err.code === 'EISDIR') {
       pkgPath = path.join(pkgPath, 'package.json')
       return readPackage(pkgPath, function (err, pkg) {
         if (err) return cb(err)
-        parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
+        parse(Object.assign({path: pkgPath, package: pkg}, baseOpts), cb)
       })
     }
-    parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
+    parse(Object.assign({path: pkgPath, package: pkg}, baseOpts), cb)
   })
 }
 
@@ -76,6 +83,13 @@ function parse (opts, cb) {
   var pkgPath = opts.path
   var pkg = opts.package
 
+  var extensions = opts.extensions
+  var configuredDetective = opts.detective
+    ? (typeof opts.detective === 'string' ? require(opts.detective) : opts.detective)
+    : detective
+
+  if (!configuredDetective || typeof configuredDetective !== 'function') return cb(new Error('Found no valid detective function'))
+
   var paths = []
   var seen = []
   var core = []
@@ -132,7 +146,7 @@ function parse (opts, cb) {
     if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
       var filename = './' + path.basename(file)
       debug('resolve', [path.dirname(file), filename])
-      file = resolve.sync(filename, { basedir: path.dirname(file) })
+      file = resolve.sync(filename, { basedir: path.dirname(file), extensions: extensions })
     }
 
     fs.readFile(file, 'utf8', read)
@@ -142,7 +156,7 @@ function parse (opts, cb) {
         return callback(err)
       }
 
-      var requires = detective(contents)
+      var requires = configuredDetective(contents)
       var relatives = []
       requires.map(function (req) {
         var isCore = builtins.indexOf(req) > -1

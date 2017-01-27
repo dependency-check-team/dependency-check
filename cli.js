@@ -12,7 +12,8 @@ var args = require('minimist')(process.argv.slice(2), {
   boolean: ['missing', 'extra', 'dev', 'version', 'ignore', 'default-entries'],
   alias: {
     extra: 'unused',
-    'ignore-module': 'i'
+    'ignore-module': 'i',
+    'extensions': 'e'
   }
 })
 
@@ -31,6 +32,8 @@ if (args.help || args._.length === 0) {
   console.log("--ignore-module, -i   Won't tell you about module names passed in as --ignore-module / -i. Only usable with --unused")
   console.log('--entry               By default your main and bin entries from package.json will be parsed, but you can add more the list of entries by passing them in as --entry')
   console.log("--no-default-entries  Won't parse your main and bin entries from package.json will be parsed")
+  console.log('--detective           Pointing to a requireable path of a javascript file containing an alternative implementation of the detective module that supports extended or alternate syntaxes')
+  console.log("--extensions, -e      Comma-separated list of file extensions to use when resolving require paths. Eg. 'js,jsx'")
   console.log('--version             Show current version')
   console.log('--ignore              To always exit with code 0 pass --ignore')
   console.log('')
@@ -38,10 +41,21 @@ if (args.help || args._.length === 0) {
   process.exit(1)
 }
 
+var extensions
+
+if (args.e) {
+  extensions = args.e.split(',').map(function (item) {
+    item = item.trim()
+    return item[0] === '.' ? item : '.' + item
+  })
+}
+
 check({
   path: args._.shift(),
   entries: args._.concat(args.entry || []),
-  noDefaultEntries: !args['default-entries']
+  noDefaultEntries: !args['default-entries'],
+  extensions: extensions,
+  detective: args.detective
 }, function (err, data) {
   if (err) {
     console.error(err.message)
