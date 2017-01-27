@@ -22,10 +22,26 @@ module.exports = function (opts, cb) {
       pkgPath = path.join(pkgPath, 'package.json')
       return readPackage(pkgPath, function (err, pkg) {
         if (err) return cb(err)
-        parse(Object.assign({path: pkgPath, package: pkg}, baseOpts), cb)
+        parse({
+          path: pkgPath,
+          package: pkg,
+          entries: opts.entries,
+          noDefaultEntries: opts.noDefaultEntries,
+          builtins: opts.builtins,
+          extensions: opts.extensions,
+          detective: opts.detective
+        }, cb)
       })
     }
-    parse(Object.assign({path: pkgPath, package: pkg}, baseOpts), cb)
+    parse({
+      path: pkgPath,
+      package: pkg,
+      entries: opts.entries,
+      noDefaultEntries: opts.noDefaultEntries,
+      builtins: opts.builtins,
+      extensions: opts.extensions,
+      detective: opts.detective
+    }, cb)
   })
 }
 
