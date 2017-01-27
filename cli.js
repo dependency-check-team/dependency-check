@@ -41,10 +41,10 @@ if (args.help || args._.length === 0) {
   process.exit(1)
 }
 
-var extensions
+var splitArg = function (arg) {
+  if (!arg) return undefined
 
-if (args.e) {
-  extensions = args.e.split(',').map(function (item) {
+  return (typeof arg === 'string' ? arg.split(',') : arg).map(function (item) {
     item = item.trim()
     return item[0] === '.' ? item : '.' + item
   })
@@ -54,7 +54,7 @@ check({
   path: args._.shift(),
   entries: args._.concat(args.entry || []),
   noDefaultEntries: !args['default-entries'],
-  extensions: extensions,
+  extensions: splitArg(args.e),
   detective: args.detective
 }, function (err, data) {
   if (err) {
