@@ -11,17 +11,17 @@
   },
   "author": "max ogden",
   "dependencies": {
-    "async": "^1.0.0",
+    "async": "^2.1.4",
     "builtins": "^1.0.0",
+    "debug": "^2.2.0",
     "detective": "^4.0.0",
+    "is-relative": "^0.2.1",
     "minimist": "^1.2.0",
     "read-package-json": "^2.0.4",
-    "resolve": "^1.1.7",
-    "is-relative": "^0.2.1",
-    "debug": "^2.2.0"
+    "resolve": "^1.1.7"
   },
   "devDependencies": {
-    "standard": "^7.1.2"
+    "standard": "^8.6.0"
   },
   "directories": {
     "test": "test"

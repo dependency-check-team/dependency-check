@@ -1,7 +1,7 @@
 var path = require('path')
 var fs = require('fs')
 var readPackage = require('read-package-json')
-var async = require('async')
+var asyncMap = require('async/map')
 var builtins = require('builtins')
 var resolve = require('resolve')
 var debug = require('debug')('dependency-check')
@@ -134,7 +134,7 @@ function parse (opts, cb) {
 
   if (paths.length === 0) return cb(new Error('No entry paths found'))
 
-  async.map(paths, function (file, cb) {
+  asyncMap(paths, function (file, cb) {
     getDeps(file, path.dirname(pkgPath), cb)
   }, function (err, allDeps) {
     if (err) return cb(err)
@@ -201,7 +201,7 @@ function parse (opts, cb) {
         }
       })
 
-      async.map(relatives, function (name, cb) {
+      asyncMap(relatives, function (name, cb) {
         getDeps(name, basedir, cb)
       }, done)
     }
