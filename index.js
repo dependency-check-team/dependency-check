@@ -1,7 +1,6 @@
 var path = require('path')
 var fs = require('fs')
 var readPackage = require('read-package-json')
-var detective = require('detective')
 var async = require('async')
 var builtins = require('builtins')
 var resolve = require('resolve')
@@ -15,10 +14,26 @@ module.exports = function (opts, cb) {
       pkgPath = path.join(pkgPath, 'package.json')
       return readPackage(pkgPath, function (err, pkg) {
         if (err) return cb(err)
-        parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
+        parse({
+          path: pkgPath,
+          package: pkg,
+          entries: opts.entries,
+          noDefaultEntries: opts.noDefaultEntries,
+          builtins: opts.builtins,
+          extensions: opts.extensions,
+          detective: opts.detective
+        }, cb)
       })
     }
-    parse({path: pkgPath, package: pkg, entries: opts.entries, noDefaultEntries: opts.noDefaultEntries, builtins: opts.builtins}, cb)
+    parse({
+      path: pkgPath,
+      package: pkg,
+      entries: opts.entries,
+      noDefaultEntries: opts.noDefaultEntries,
+      builtins: opts.builtins,
+      extensions: opts.extensions,
+      detective: opts.detective
+    }, cb)
   })
 }
 
@@ -76,6 +91,17 @@ function parse (opts, cb) {
   var pkgPath = opts.path
   var pkg = opts.package
 
+  var extensions = opts.extensions
+  var detective
+
+  try {
+    detective = opts.detective
+      ? (typeof opts.detective === 'string' ? require(opts.detective) : opts.detective)
+      : require('detective')
+  } catch (e) {}
+
+  if (!detective || typeof detective !== 'function') return cb(new Error('Found no valid detective function'))
+
   var paths = []
   var seen = []
   var core = []
@@ -132,7 +158,7 @@ function parse (opts, cb) {
     if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
       var filename = './' + path.basename(file)
       debug('resolve', [path.dirname(file), filename])
-      file = resolve.sync(filename, { basedir: path.dirname(file) })
+      file = resolve.sync(filename, { basedir: path.dirname(file), extensions: extensions })
     }
 
     fs.readFile(file, 'utf8', read)

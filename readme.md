@@ -70,6 +70,14 @@ dependency-check package.json tests.js
 
 running `dependency-check package.json --no-default-entries --entry tests.js` won't parse any entries other than `tests.js`.  None of the entries from your package.json `main` and `bin` will be parsed
 
+### --extensions, -e
+
+running `dependency-check ./package.json -e js,jsx` will resolve extensionless require paths to both `.js` and `.jsx` paths. Defaults to just `.js`
+
+### --detective
+
+running `dependency-check ./package.json  --detective precinct` will `require()` the local path `precinct` which will load the [precinct](https://www.npmjs.com/package/precinct) module if that has been installed. The loaded module will then be used instead of the default [detective](https://www.npmjs.com/package/detective) module when looking up all required modules.
+
 ### --help
 
 shows above options and all other available options
