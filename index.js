@@ -20,8 +20,7 @@ module.exports = function (opts, cb) {
           entries: opts.entries,
           noDefaultEntries: opts.noDefaultEntries,
           builtins: opts.builtins,
-          extensions: opts.extensions,
-          detective: opts.detective
+          extensions: getExtensions(opts.extensions, opts.detective)
         }, cb)
       })
     }
@@ -31,8 +30,7 @@ module.exports = function (opts, cb) {
       entries: opts.entries,
       noDefaultEntries: opts.noDefaultEntries,
       builtins: opts.builtins,
-      extensions: opts.extensions,
-      detective: opts.detective
+      extensions: getExtensions(opts.extensions, opts.detective)
     }, cb)
   })
 }
@@ -63,6 +61,46 @@ module.exports.extra = function (pkg, deps, options) {
   return missing
 }
 
+function getDetective (name) {
+  try {
+    return name
+      ? (typeof name === 'string' ? require(name) : name)
+      : require('detective')
+  } catch (e) {}
+}
+
+function noopDetective () {
+  return []
+}
+
+function getExtensions (extensions, detective) {
+  // Initialize extensions with node.js default handlers.
+  var result = {
+    '.js': noopDetective,
+    '.node': noopDetective,
+    '.json': noopDetective
+  }
+
+  if (Array.isArray(extensions)) {
+    extensions.forEach(function (extension) {
+      result[extension] = getDetective(detective)
+    })
+  } else if (typeof extensions === 'object') {
+    Object.keys(extensions).forEach(function (extension) {
+      result[extension] = getDetective(extensions[extension] || detective)
+    })
+  }
+
+  // Reset the `detective` instance for `.js` when it hasn't been set. This is
+  // done to defer loading detective when not needed and to keep `.js` first in
+  // the order of `Object.keys` (matching node.js behavior).
+  if (result['.js'] === noopDetective) {
+    result['.js'] = getDetective(detective)
+  }
+
+  return result
+}
+
 function configure (pkg, options) {
   options = options || {}
 
@@ -86,22 +124,11 @@ function isNotRelative (file) {
 }
 
 function parse (opts, cb) {
-  var deps = {}
-
   var pkgPath = opts.path
   var pkg = opts.package
-
   var extensions = opts.extensions
-  var detective
 
-  try {
-    detective = opts.detective
-      ? (typeof opts.detective === 'string' ? require(opts.detective) : opts.detective)
-      : require('detective')
-  } catch (e) {}
-
-  if (!detective || typeof detective !== 'function') return cb(new Error('Found no valid detective function'))
-
+  var deps = {}
   var paths = []
   var seen = []
   var core = []
@@ -158,8 +185,13 @@ function parse (opts, cb) {
     if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
       var filename = './' + path.basename(file)
       debug('resolve', [path.dirname(file), filename])
-      file = resolve.sync(filename, { basedir: path.dirname(file), extensions: extensions })
+      file = resolve.sync(filename, { basedir: path.dirname(file), extensions: Object.keys(extensions) })
     }
+
+    var ext = path.extname(file)
+    var detective = extensions[ext]
+
+    if (typeof detective !== 'function') return callback(new Error('Detective function missing for "' + ext + '"'))
 
     fs.readFile(file, 'utf8', read)
 
@@ -186,15 +218,9 @@ function parse (opts, cb) {
             }
           } else {
             debug('require("' + req + '")' + ' is relative')
-            var orig = req
             req = path.resolve(path.dirname(file), req)
             if (seen.indexOf(req) === -1) {
               seen.push(req)
-
-              // dont parse JSON
-              var ext = path.extname(req)
-              if (ext === '.json') return debug('skipping JSON', orig)
-
               relatives.push(req)
             }
           }
