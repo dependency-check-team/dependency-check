@@ -32,8 +32,8 @@ if (args.help || args._.length === 0) {
   console.log("--ignore-module, -i   Won't tell you about module names passed in as --ignore-module / -i. Only usable with --unused")
   console.log('--entry               By default your main and bin entries from package.json will be parsed, but you can add more the list of entries by passing them in as --entry')
   console.log("--no-default-entries  Won't parse your main and bin entries from package.json will be parsed")
-  console.log('--detective           Pointing to a requireable path of a javascript file containing an alternative implementation of the detective module that supports extended or alternate syntaxes')
-  console.log("--extensions, -e      Comma-separated list of file extensions to use when resolving require paths. Eg. 'js,jsx'")
+  console.log('--detective           Requireable path containing an alternative implementation of the detective module that supports alternate syntaxes')
+  console.log("--extensions, -e      List of file extensions with detective to use when resolving require paths. Eg. 'js,jsx:detective-es6'")
   console.log('--version             Show current version')
   console.log('--ignore              To always exit with code 0 pass --ignore')
   console.log('')
@@ -41,20 +41,32 @@ if (args.help || args._.length === 0) {
   process.exit(1)
 }
 
-var splitArg = function (arg) {
+function extensions (arg) {
   if (!arg) return undefined
+  var extensions = {}
 
-  return (typeof arg === 'string' ? arg.split(',') : arg).map(function (item) {
-    item = item.trim()
-    return item[0] === '.' ? item : '.' + item
-  })
+  function add (value) {
+    var parts = value.trim().split(':', 2)
+
+    parts[0].split(',').forEach(function (ext) {
+      extensions[ext.charAt(0) === '.' ? ext : '.' + ext] = parts[1]
+    })
+  }
+
+  if (typeof arg === 'string') {
+    add(arg)
+  } else {
+    arg.forEach(add)
+  }
+
+  return extensions
 }
 
 check({
   path: args._.shift(),
   entries: args._.concat(args.entry || []),
   noDefaultEntries: !args['default-entries'],
-  extensions: splitArg(args.e),
+  extensions: extensions(args.e),
   detective: args.detective
 }, function (err, data) {
   if (err) {

@@ -72,11 +72,11 @@ running `dependency-check package.json --no-default-entries --entry tests.js` wo
 
 ### --extensions, -e
 
-running `dependency-check ./package.json -e js,jsx` will resolve extensionless require paths to both `.js` and `.jsx` paths. Defaults to just `.js`
+running `dependency-check ./package.json -e js,jsx:precinct` will resolve require paths to `.js` and `.jsx` paths, and parse using [`precinct`](https://www.npmjs.com/package/precinct).
 
 ### --detective
 
-running `dependency-check ./package.json  --detective precinct` will `require()` the local path `precinct` which will load the [precinct](https://www.npmjs.com/package/precinct) module if that has been installed. The loaded module will then be used instead of the default [detective](https://www.npmjs.com/package/detective) module when looking up all required modules.
+running `dependency-check ./package.json --detective precinct` will `require()` the local `precinct` as the default parser. This can be set per-extension using using `-e`. Defaults to parsing with [`detective`](https://www.npmjs.com/package/detective).
 
 ### --help
 
