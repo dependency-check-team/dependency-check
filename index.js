@@ -162,7 +162,7 @@ function parse (opts, cb) {
   if (paths.length === 0) return cb(new Error('No entry paths found'))
 
   asyncMap(paths, function (file, cb) {
-    getDeps(file, path.dirname(pkgPath), cb)
+    resolveDep(file, cb)
   }, function (err, allDeps) {
     if (err) return cb(err)
     var used = {}
@@ -177,28 +177,33 @@ function parse (opts, cb) {
     cb(null, {package: pkg, used: Object.keys(used)})
   })
 
-  function getDeps (file, basedir, callback) {
+  function resolveDep (file, callback) {
     if (isNotRelative(file)) {
       return callback(null)
     }
 
-    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
-      var filename = './' + path.basename(file)
-      debug('resolve', [path.dirname(file), filename])
-      file = resolve.sync(filename, { basedir: path.dirname(file), extensions: Object.keys(extensions) })
-    }
+    return resolve(file, {
+      basedir: path.dirname(file),
+      extensions: Object.keys(extensions)
+    }, function (err, path) {
+      if (err) return callback(err)
 
+      return getDeps(path, callback)
+    })
+  }
+
+  function getDeps (file, callback) {
     var ext = path.extname(file)
-    var detective = extensions[ext]
+    var detective = extensions[ext] || extensions['.js']
 
-    if (typeof detective !== 'function') return callback(new Error('Detective function missing for "' + ext + '"'))
+    if (typeof detective !== 'function') {
+      return callback(new Error('Detective function missing for "' + file + '"'))
+    }
 
     fs.readFile(file, 'utf8', read)
 
     function read (err, contents) {
-      if (err) {
-        return callback(err)
-      }
+      if (err) return callback(err)
 
       var requires = detective(contents)
       var relatives = []
@@ -228,15 +233,12 @@ function parse (opts, cb) {
       })
 
       asyncMap(relatives, function (name, cb) {
-        getDeps(name, basedir, cb)
+        resolveDep(name, cb)
       }, done)
     }
 
     function done (err) {
-      if (err) {
-        return callback(err)
-      }
-      callback(null, deps)
+      return callback(err, deps)
     }
   }
 }

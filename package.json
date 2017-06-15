@@ -7,7 +7,7 @@
     "dependency-check": "cli.js"
   },
   "scripts": {
-    "test": "standard && node cli.js test/ && node cli.js . && node cli.js . --extra --no-dev && node cli.js . -e js,jsx:detective-es6"
+    "test": "standard && node cli.js test/ && node cli.js . && node cli.js . --missing --extra --no-dev -e js:detective-cjs"
   },
   "author": "max ogden",
   "dependencies": {
@@ -21,7 +21,7 @@
     "resolve": "^1.1.7"
   },
   "devDependencies": {
-    "detective-es6": "^1.1.6",
+    "detective-cjs": "^2.0.0",
     "standard": "^10.0.2"
   },
   "directories": {
