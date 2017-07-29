@@ -16,7 +16,7 @@ checks which modules you have used in your code and then makes sure they are lis
 
 the goal of this module is to simply check that all non-relative modules that get `require()`'d are in package.json, which prevents people from getting 'module not found' errors when they install your module that has missing deps which was accidentally published to NPM (happened to me all the time, hence the impetus to write this module).
 
-## CLI usage
+## cli usage
 
 ```
 $ npm install dependency-check -g
@@ -44,11 +44,11 @@ running `dependency-check ./package.json --unused` will do the inverse of the de
 
 ### --no-dev
 
-running `dependency-check ./package.json --unused --no-dev` will not tell you if any devDependencies in your package.json were not used in your code. Only usable with `--unused`
+running `dependency-check ./package.json --unused --no-dev` will not tell you if any devDependencies in your package.json were missing or unused
 
 ### --ignore-module, -i
 
-running `dependency-check ./package.json --unused --ignore-module foo` will not tell you if the `foo` module was not used in your code. You can specify as many separate `--ignore-module` arguments as you want. Only usable with `--unused`
+running `dependency-check ./package.json --unused --ignore-module foo` will not tell you if the `foo` module was not used in your code. You can specify as many separate `--ignore-module` arguments as you want
 
 ### --entry
 
