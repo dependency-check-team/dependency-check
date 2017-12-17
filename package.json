@@ -12,7 +12,7 @@
   "author": "max ogden",
   "dependencies": {
     "async": "^2.1.4",
-    "builtins": "^1.0.0",
+    "builtins": "^2.0.0",
     "debug": "^2.2.0",
     "detective": "^4.0.0",
     "is-relative": "^0.2.1",
