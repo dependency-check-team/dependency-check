@@ -3,7 +3,7 @@
 checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json, or vice-versa
 
 [![dat](http://img.shields.io/badge/Development%20sponsored%20by-dat-green.svg?style=flat)](http://dat-data.com/)
-[![Travis](http://img.shields.io/travis/maxogden/dependency-check.svg?style=flat)](https://travis-ci.org/maxogden/dependency-check)
+[![Build Status](https://travis-ci.org/maxogden/dependency-check.svg?branch=master)](https://travis-ci.org/maxogden/dependency-check)
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
