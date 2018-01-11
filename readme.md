@@ -46,6 +46,10 @@ running `dependency-check ./package.json --unused` will do the inverse of the de
 
 running `dependency-check ./package.json --unused --no-dev` will not tell you if any devDependencies in your package.json were missing or unused
 
+### --no-peer
+
+running `dependency-check ./package.json --unused --no-peer` will not tell you if any peerDependencies in your package.json were missing or unused
+
 ### --ignore-module, -i
 
 running `dependency-check ./package.json --unused --ignore-module foo` will not tell you if the `foo` module was not used in your code. You can specify as many separate `--ignore-module` arguments as you want
