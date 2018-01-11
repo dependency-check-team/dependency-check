@@ -109,6 +109,10 @@ function configure (pkg, options) {
 
   if (typeof ignore === 'string') ignore = [ignore]
 
+  if (!options.excludePeer) {
+    allDeps = allDeps.concat(Object.keys(pkg.peerDependencies || {}))
+  }
+
   if (!options.excludeDev) {
     allDeps = allDeps.concat(Object.keys(pkg.devDependencies || {}))
   }
