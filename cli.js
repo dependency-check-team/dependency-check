@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict'
+
 const check = require('./')
 
 const args = require('minimist')(process.argv.slice(2), {
