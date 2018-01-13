@@ -15,9 +15,9 @@
   "author": "max ogden",
   "dependencies": {
     "builtins": "^2.0.0",
-    "debug": "^2.2.0",
-    "detective": "^4.0.0",
-    "is-relative": "^0.2.1",
+    "debug": "^3.1.0",
+    "detective": "^5.0.2",
+    "is-relative": "^1.0.0",
     "minimist": "^1.2.0",
     "read-package-json": "^2.0.10",
     "resolve": "^1.1.7"
