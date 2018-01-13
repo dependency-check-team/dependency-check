@@ -19,7 +19,7 @@
     "detective": "^4.0.0",
     "is-relative": "^0.2.1",
     "minimist": "^1.2.0",
-    "read-package-json": "2.0.10",
+    "read-package-json": "^2.0.10",
     "resolve": "^1.1.7"
   },
   "devDependencies": {
