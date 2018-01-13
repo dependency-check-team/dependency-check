@@ -1,12 +1,12 @@
-var path = require('path')
-var fs = require('fs')
-var readPackage = require('read-package-json')
-var builtins = require('builtins')()
-var resolveModule = require('resolve')
-var debug = require('debug')('dependency-check')
-var isRelative = require('is-relative')
+const path = require('path')
+const fs = require('fs')
+const readPackage = require('read-package-json')
+const builtins = require('builtins')()
+const resolveModule = require('resolve')
+const debug = require('debug')('dependency-check')
+const isRelative = require('is-relative')
 
-var promisedReadPackage = function (pkgPath) {
+const promisedReadPackage = function (pkgPath) {
   return new Promise((resolve, reject) => {
     readPackage(pkgPath, (err, pkg) => {
       if (err) return reject(err)
@@ -16,8 +16,8 @@ var promisedReadPackage = function (pkgPath) {
 }
 
 module.exports = function (opts, cb) {
-  var pkgPath = opts.path
-  var result = promisedReadPackage(pkgPath)
+  let pkgPath = opts.path
+  const result = promisedReadPackage(pkgPath)
     .catch(err => {
       if (err && err.code === 'EISDIR') {
         pkgPath = path.join(pkgPath, 'package.json')
@@ -45,8 +45,8 @@ module.exports = function (opts, cb) {
 }
 
 module.exports.missing = function (pkg, deps, options) {
-  var missing = []
-  var config = configure(pkg, options)
+  const missing = []
+  const config = configure(pkg, options)
 
   deps.map(used => {
     if (config.allDeps.indexOf(used) === -1 && config.ignore.indexOf(used) === -1) {
@@ -58,8 +58,8 @@ module.exports.missing = function (pkg, deps, options) {
 }
 
 module.exports.extra = function (pkg, deps, options) {
-  var missing = []
-  var config = configure(pkg, options)
+  const missing = []
+  const config = configure(pkg, options)
 
   config.allDeps.map(dep => {
     if (deps.indexOf(dep) === -1 && config.ignore.indexOf(dep) === -1) {
@@ -84,7 +84,7 @@ function noopDetective () {
 
 function getExtensions (extensions, detective) {
   // Initialize extensions with node.js default handlers.
-  var result = {
+  const result = {
     '.js': noopDetective,
     '.node': noopDetective,
     '.json': noopDetective
@@ -113,8 +113,8 @@ function getExtensions (extensions, detective) {
 function configure (pkg, options) {
   options = options || {}
 
-  var allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.peerDependencies || {}))
-  var ignore = options.ignore || []
+  let allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.peerDependencies || {}))
+  let ignore = options.ignore || []
 
   if (typeof ignore === 'string') ignore = [ignore]
 
@@ -137,15 +137,15 @@ function isNotRelative (file) {
 }
 
 function parse (opts) {
-  var pkgPath = opts.path
-  var pkg = opts.package
-  var extensions = opts.extensions
+  const pkgPath = opts.path
+  const pkg = opts.package
+  const extensions = opts.extensions
 
-  var deps = {}
-  var paths = []
-  var seen = []
-  var core = []
-  var mainPath = path.resolve(pkg.main || path.join(path.dirname(pkgPath), 'index.js'))
+  const deps = {}
+  const paths = []
+  const seen = []
+  const core = []
+  const mainPath = path.resolve(pkg.main || path.join(path.dirname(pkgPath), 'index.js'))
   if (!opts.noDefaultEntries && fs.existsSync(mainPath)) paths.push(mainPath)
 
   if (!opts.noDefaultEntries && pkg.bin) {
@@ -153,7 +153,7 @@ function parse (opts) {
       paths.push(path.resolve(path.join(path.dirname(pkgPath), pkg.bin)))
     } else {
       Object.keys(pkg.bin).forEach(cmdName => {
-        var cmd = pkg.bin[cmdName]
+        const cmd = pkg.bin[cmdName]
         paths.push(path.resolve(path.join(path.dirname(pkgPath), cmd)))
       })
     }
@@ -176,7 +176,7 @@ function parse (opts) {
 
   return Promise.all(paths.map(file => resolveDep(file)))
     .then(allDeps => {
-      var used = {}
+      const used = {}
       // merge all deps into one unique list
       allDeps.forEach(deps => {
         Object.keys(deps).forEach(dep => {
@@ -207,8 +207,8 @@ function parse (opts) {
   }
 
   function getDeps (file) {
-    var ext = path.extname(file)
-    var detective = extensions[ext] || extensions['.js']
+    const ext = path.extname(file)
+    const detective = extensions[ext] || extensions['.js']
 
     if (typeof detective !== 'function') {
       return Promise.reject(new Error('Detective function missing for "' + file + '"'))
@@ -221,10 +221,10 @@ function parse (opts) {
       })
     })
       .then(contents => {
-        var requires = detective(contents)
-        var relatives = []
+        const requires = detective(contents)
+        const relatives = []
         requires.map(req => {
-          var isCore = builtins.indexOf(req) > -1
+          const isCore = builtins.indexOf(req) > -1
           if (isNotRelative(req) && !isCore) {
             // require('foo/bar') -> require('foo')
             if (req[0] !== '@' && req.indexOf('/') > -1) req = req.split('/')[0]

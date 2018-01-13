@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-var check = require('./')
+const check = require('./')
 
-var args = require('minimist')(process.argv.slice(2), {
+const args = require('minimist')(process.argv.slice(2), {
   default: {
     missing: false,
     extra: false,
@@ -44,10 +44,10 @@ if (args.help || args._.length === 0) {
 
 function extensions (arg) {
   if (!arg) return undefined
-  var extensions = {}
+  const extensions = {}
 
   function add (value) {
-    var parts = value.trim().split(':', 2)
+    const parts = value.trim().split(':', 2)
 
     parts[0].split(',').forEach(function (ext) {
       extensions[ext.charAt(0) === '.' ? ext : '.' + ext] = parts[1]
@@ -71,16 +71,16 @@ check({
   detective: args.detective
 })
   .then(data => {
-    var pkg = data.package
-    var deps = data.used
-    var failed = 0
-    var options = {
+    const pkg = data.package
+    const deps = data.used
+    let failed = 0
+    const options = {
       excludeDev: args.dev === false,
       excludePeer: args.peer === false,
       ignore: [].concat(args.i || [])
     }
     if (args.extra) {
-      var extras = check.extra(pkg, deps, options)
+      const extras = check.extra(pkg, deps, options)
       failed += extras.length
       if (extras.length) {
         console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
@@ -89,7 +89,7 @@ check({
       }
     }
     if (args.missing || !args.extra) {
-      var missing = check.missing(pkg, deps, options)
+      const missing = check.missing(pkg, deps, options)
       failed += missing.length
       if (missing.length) {
         console.error('Fail! Dependencies not listed in package.json: ' + missing.join(', '))
