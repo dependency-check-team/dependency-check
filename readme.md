@@ -7,6 +7,10 @@ checks which modules you have used in your code and then makes sure they are lis
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
+## requirements
+
+dependency-check `3.x` supports Node.js 6 and later
+
 ## how it works
 
 `dependency-check` parses your module code starting from the default entry files (e.g. `index.js` or `main` and any `bin` commands defined in package.json) and traverses through all relatively required JS files, ultimately producing a list of non-relative modules
