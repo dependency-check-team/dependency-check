@@ -1,38 +1,47 @@
 var path = require('path')
 var fs = require('fs')
 var readPackage = require('read-package-json')
-var asyncMap = require('async/map')
 var builtins = require('builtins')()
-var resolve = require('resolve')
+var resolveModule = require('resolve')
 var debug = require('debug')('dependency-check')
 var isRelative = require('is-relative')
 
+var promisedReadPackage = function (pkgPath) {
+  return new Promise((resolve, reject) => {
+    readPackage(pkgPath, (err, pkg) => {
+      if (err) return reject(err)
+      resolve(pkg)
+    })
+  })
+}
+
 module.exports = function (opts, cb) {
   var pkgPath = opts.path
-  readPackage(pkgPath, function (err, pkg) {
-    if (err && err.code === 'EISDIR') {
-      pkgPath = path.join(pkgPath, 'package.json')
-      return readPackage(pkgPath, function (err, pkg) {
-        if (err) return cb(err)
-        parse({
-          path: pkgPath,
-          package: pkg,
-          entries: opts.entries,
-          noDefaultEntries: opts.noDefaultEntries,
-          builtins: opts.builtins,
-          extensions: getExtensions(opts.extensions, opts.detective)
-        }, cb)
-      })
-    }
-    parse({
+  var result = promisedReadPackage(pkgPath)
+    .catch(err => {
+      if (err && err.code === 'EISDIR') {
+        pkgPath = path.join(pkgPath, 'package.json')
+        return promisedReadPackage(pkgPath)
+      }
+      return Promise.reject(err)
+    })
+    .then(pkg => parse({
       path: pkgPath,
       package: pkg,
       entries: opts.entries,
       noDefaultEntries: opts.noDefaultEntries,
       builtins: opts.builtins,
       extensions: getExtensions(opts.extensions, opts.detective)
-    }, cb)
-  })
+    }))
+
+  if (cb) {
+    result
+      .then(value => { cb(null, value) })
+      .catch(err => { cb(err) })
+    return
+  }
+
+  return result
 }
 
 module.exports.missing = function (pkg, deps, options) {
@@ -127,7 +136,7 @@ function isNotRelative (file) {
   return isRelative(file) && file[0] !== '.'
 }
 
-function parse (opts, cb) {
+function parse (opts) {
   var pkgPath = opts.path
   var pkg = opts.package
   var extensions = opts.extensions
@@ -163,86 +172,84 @@ function parse (opts, cb) {
 
   debug('entry paths', paths)
 
-  if (paths.length === 0) return cb(new Error('No entry paths found'))
+  if (paths.length === 0) return Promise.reject(new Error('No entry paths found'))
 
-  asyncMap(paths, function (file, cb) {
-    resolveDep(file, cb)
-  }, function (err, allDeps) {
-    if (err) return cb(err)
-    var used = {}
-    // merge all deps into one unique list
-    allDeps.forEach(function (deps) {
-      Object.keys(deps).forEach(function (dep) {
-        used[dep] = true
+  return Promise.all(paths.map(file => resolveDep(file)))
+    .then(allDeps => {
+      var used = {}
+      // merge all deps into one unique list
+      allDeps.forEach(function (deps) {
+        Object.keys(deps).forEach(function (dep) {
+          used[dep] = true
+        })
       })
+
+      if (opts.builtins) return {package: pkg, used: Object.keys(used), builtins: core}
+
+      return {package: pkg, used: Object.keys(used)}
     })
-    if (opts.builtins) return cb(null, {package: pkg, used: Object.keys(used), builtins: core})
 
-    cb(null, {package: pkg, used: Object.keys(used)})
-  })
-
-  function resolveDep (file, callback) {
+  function resolveDep (file) {
     if (isNotRelative(file)) {
-      return callback(null)
+      return Promise.resolve(null)
     }
 
-    return resolve(file, {
-      basedir: path.dirname(file),
-      extensions: Object.keys(extensions)
-    }, function (err, path) {
-      if (err) return callback(err)
-
-      return getDeps(path, callback)
+    return new Promise((resolve, reject) => {
+      resolveModule(file, {
+        basedir: path.dirname(file),
+        extensions: Object.keys(extensions)
+      }, (err, path) => {
+        if (err) return reject(err)
+        resolve(path)
+      })
     })
+      .then(path => getDeps(path))
   }
 
-  function getDeps (file, callback) {
+  function getDeps (file) {
     var ext = path.extname(file)
     var detective = extensions[ext] || extensions['.js']
 
     if (typeof detective !== 'function') {
-      return callback(new Error('Detective function missing for "' + file + '"'))
+      return Promise.reject(new Error('Detective function missing for "' + file + '"'))
     }
 
-    fs.readFile(file, 'utf8', read)
-
-    function read (err, contents) {
-      if (err) return callback(err)
-
-      var requires = detective(contents)
-      var relatives = []
-      requires.map(function (req) {
-        var isCore = builtins.indexOf(req) > -1
-        if (isNotRelative(req) && !isCore) {
-          // require('foo/bar') -> require('foo')
-          if (req[0] !== '@' && req.indexOf('/') > -1) req = req.split('/')[0]
-          else if (req[0] === '@') req = req.split('/').slice(0, 2).join('/')
-          debug('require("' + req + '")' + ' is a dependency')
-          deps[req] = true
-        } else {
-          if (isCore) {
-            debug('require("' + req + '")' + ' is core')
-            if (core.indexOf(req) === -1) {
-              core.push(req)
-            }
+    return new Promise((resolve, reject) => {
+      fs.readFile(file, 'utf8', (err, contents) => {
+        if (err) return reject(err)
+        resolve(contents)
+      })
+    })
+      .then(contents => {
+        var requires = detective(contents)
+        var relatives = []
+        requires.map(function (req) {
+          var isCore = builtins.indexOf(req) > -1
+          if (isNotRelative(req) && !isCore) {
+            // require('foo/bar') -> require('foo')
+            if (req[0] !== '@' && req.indexOf('/') > -1) req = req.split('/')[0]
+            else if (req[0] === '@') req = req.split('/').slice(0, 2).join('/')
+            debug('require("' + req + '")' + ' is a dependency')
+            deps[req] = true
           } else {
-            debug('require("' + req + '")' + ' is relative')
-            req = path.resolve(path.dirname(file), req)
-            if (seen.indexOf(req) === -1) {
-              seen.push(req)
-              relatives.push(req)
+            if (isCore) {
+              debug('require("' + req + '")' + ' is core')
+              if (core.indexOf(req) === -1) {
+                core.push(req)
+              }
+            } else {
+              debug('require("' + req + '")' + ' is relative')
+              req = path.resolve(path.dirname(file), req)
+              if (seen.indexOf(req) === -1) {
+                seen.push(req)
+                relatives.push(req)
+              }
             }
           }
-        }
+        })
+
+        return Promise.all(relatives.map(name => resolveDep(name)))
+          .then(() => deps)
       })
-
-      asyncMap(relatives, function (name, cb) {
-        resolveDep(name, cb)
-      }, done)
-    }
-
-    function done (err) {
-      return callback(err, deps)
-    }
   }
 }

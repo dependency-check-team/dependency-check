@@ -69,36 +69,37 @@ check({
   noDefaultEntries: !args['default-entries'],
   extensions: extensions(args.e),
   detective: args.detective
-}, function (err, data) {
-  if (err) {
-    console.error(err.message)
-    return process.exit(1)
-  }
-  var pkg = data.package
-  var deps = data.used
-  var failed = 0
-  var options = {
-    excludeDev: args.dev === false,
-    excludePeer: args.peer === false,
-    ignore: [].concat(args.i || [])
-  }
-  if (args.extra) {
-    var extras = check.extra(pkg, deps, options)
-    failed += extras.length
-    if (extras.length) {
-      console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
-    } else {
-      console.log('Success! All dependencies in package.json are used in the code')
-    }
-  }
-  if (args.missing || !args.extra) {
-    var missing = check.missing(pkg, deps, options)
-    failed += missing.length
-    if (missing.length) {
-      console.error('Fail! Dependencies not listed in package.json: ' + missing.join(', '))
-    } else {
-      console.log('Success! All dependencies used in the code are listed in package.json')
-    }
-  }
-  process.exit(args.ignore || !failed ? 0 : 1)
 })
+  .then(data => {
+    var pkg = data.package
+    var deps = data.used
+    var failed = 0
+    var options = {
+      excludeDev: args.dev === false,
+      excludePeer: args.peer === false,
+      ignore: [].concat(args.i || [])
+    }
+    if (args.extra) {
+      var extras = check.extra(pkg, deps, options)
+      failed += extras.length
+      if (extras.length) {
+        console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
+      } else {
+        console.log('Success! All dependencies in package.json are used in the code')
+      }
+    }
+    if (args.missing || !args.extra) {
+      var missing = check.missing(pkg, deps, options)
+      failed += missing.length
+      if (missing.length) {
+        console.error('Fail! Dependencies not listed in package.json: ' + missing.join(', '))
+      } else {
+        console.log('Success! All dependencies used in the code are listed in package.json')
+      }
+    }
+    process.exit(args.ignore || !failed ? 0 : 1)
+  })
+  .catch(err => {
+    console.error(err.message)
+    process.exit(1)
+  })
