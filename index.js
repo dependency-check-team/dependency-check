@@ -48,7 +48,7 @@ module.exports.missing = function (pkg, deps, options) {
   var missing = []
   var config = configure(pkg, options)
 
-  deps.map(function (used) {
+  deps.map(used => {
     if (config.allDeps.indexOf(used) === -1 && config.ignore.indexOf(used) === -1) {
       missing.push(used)
     }
@@ -61,7 +61,7 @@ module.exports.extra = function (pkg, deps, options) {
   var missing = []
   var config = configure(pkg, options)
 
-  config.allDeps.map(function (dep) {
+  config.allDeps.map(dep => {
     if (deps.indexOf(dep) === -1 && config.ignore.indexOf(dep) === -1) {
       missing.push(dep)
     }
@@ -91,11 +91,11 @@ function getExtensions (extensions, detective) {
   }
 
   if (Array.isArray(extensions)) {
-    extensions.forEach(function (extension) {
+    extensions.forEach(extension => {
       result[extension] = getDetective(detective)
     })
   } else if (typeof extensions === 'object') {
-    Object.keys(extensions).forEach(function (extension) {
+    Object.keys(extensions).forEach(extension => {
       result[extension] = getDetective(extensions[extension] || detective)
     })
   }
@@ -152,7 +152,7 @@ function parse (opts) {
     if (typeof pkg.bin === 'string') {
       paths.push(path.resolve(path.join(path.dirname(pkgPath), pkg.bin)))
     } else {
-      Object.keys(pkg.bin).forEach(function (cmdName) {
+      Object.keys(pkg.bin).forEach(cmdName => {
         var cmd = pkg.bin[cmdName]
         paths.push(path.resolve(path.join(path.dirname(pkgPath), cmd)))
       })
@@ -162,7 +162,7 @@ function parse (opts) {
   // pass in custom additional entries e.g. ['./test.js']
   if (opts.entries) {
     if (typeof opts.entries === 'string') opts.entries = [opts.entries]
-    opts.entries.forEach(function (entry) {
+    opts.entries.forEach(entry => {
       entry = path.resolve(path.join(path.dirname(pkgPath), entry))
       if (paths.indexOf(entry) === -1) {
         paths.push(entry)
@@ -178,8 +178,8 @@ function parse (opts) {
     .then(allDeps => {
       var used = {}
       // merge all deps into one unique list
-      allDeps.forEach(function (deps) {
-        Object.keys(deps).forEach(function (dep) {
+      allDeps.forEach(deps => {
+        Object.keys(deps).forEach(dep => {
           used[dep] = true
         })
       })
@@ -223,7 +223,7 @@ function parse (opts) {
       .then(contents => {
         var requires = detective(contents)
         var relatives = []
-        requires.map(function (req) {
+        requires.map(req => {
           var isCore = builtins.indexOf(req) > -1
           if (isNotRelative(req) && !isCore) {
             // require('foo/bar') -> require('foo')
