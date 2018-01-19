@@ -9,9 +9,10 @@ const args = require('minimist')(process.argv.slice(2), {
     missing: false,
     extra: false,
     dev: true,
-    'default-entries': true
+    'default-entries': true,
+    quiet: false,
   },
-  boolean: ['missing', 'extra', 'dev', 'version', 'ignore', 'default-entries'],
+  boolean: ['missing', 'extra', 'dev', 'version', 'ignore', 'default-entries', 'quiet'],
   alias: {
     extra: 'unused',
     'ignore-module': 'i',
@@ -39,6 +40,7 @@ if (args.help || args._.length === 0) {
   console.log("--extensions, -e      List of file extensions with detective to use when resolving require paths. Eg. 'js,jsx:detective-es6'")
   console.log('--version             Show current version')
   console.log('--ignore              To always exit with code 0 pass --ignore')
+  console.log('--quiet               To disable logging on success')
   console.log('')
 
   process.exit(1)
@@ -86,7 +88,7 @@ check({
       failed += extras.length
       if (extras.length) {
         console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
-      } else {
+      } else if (!args.quiet) {
         console.log('Success! All dependencies in package.json are used in the code')
       }
     }
@@ -95,7 +97,7 @@ check({
       failed += missing.length
       if (missing.length) {
         console.error('Fail! Dependencies not listed in package.json: ' + missing.join(', '))
-      } else {
+      } else if (!args.quiet) {
         console.log('Success! All dependencies used in the code are listed in package.json')
       }
     }
