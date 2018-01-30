@@ -10,7 +10,7 @@ const args = require('minimist')(process.argv.slice(2), {
     extra: false,
     dev: true,
     'default-entries': true,
-    quiet: false,
+    quiet: false
   },
   boolean: ['missing', 'extra', 'dev', 'version', 'ignore', 'default-entries', 'quiet'],
   alias: {
