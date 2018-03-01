@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "detective-cjs": "^2.0.0",
-    "standard": "^10.0.2"
+    "standard": "^11.0.0"
   },
   "directories": {
     "test": "test"
