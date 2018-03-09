@@ -11,6 +11,8 @@ checks which modules you have used in your code and then makes sure they are lis
 
 dependency-check `3.x` supports Node.js 6 and later
 
+dependency-check `2.x` supports Node.js 0.10 and later (Dev note: published using the `legacy` tag)
+
 ## how it works
 
 `dependency-check` parses your module code starting from the default entry files (e.g. `index.js` or `main` and any `bin` commands defined in package.json) and traverses through all relatively required JS files, ultimately producing a list of non-relative modules
