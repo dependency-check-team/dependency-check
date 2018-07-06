@@ -7,6 +7,7 @@ const builtins = require('builtins')()
 const resolveModule = require('resolve')
 const debug = require('debug')('dependency-check')
 const isRelative = require('is-relative')
+const globby = require('globby')
 
 const promisedReadPackage = function (pkgPath) {
   return new Promise((resolve, reject) => {
@@ -164,10 +165,17 @@ function parse (opts) {
   // pass in custom additional entries e.g. ['./test.js']
   if (opts.entries) {
     if (typeof opts.entries === 'string') opts.entries = [opts.entries]
-    opts.entries.forEach(entry => {
-      entry = path.resolve(path.join(path.dirname(pkgPath), entry))
-      if (paths.indexOf(entry) === -1) {
-        paths.push(entry)
+
+    globby.sync(opts.entries, {
+      cwd: path.dirname(pkgPath),
+      absolute: true,
+      expandDirectories: false
+    }).forEach(entry => {
+      // Globby yields unix-style paths.
+      const normalized = path.resolve(entry)
+
+      if (paths.indexOf(normalized) === -1) {
+        paths.push(normalized)
       }
     })
   }
