@@ -60,7 +60,7 @@ running `dependency-check ./package.json --unused --no-peer` will not tell you i
 
 ### --ignore-module, -i
 
-running `dependency-check ./package.json --unused --ignore-module foo` will not tell you if the `foo` module was not used in your code. You can specify as many separate `--ignore-module` arguments as you want
+ignores a module. This works for both `--unused` and `--missing`. You can specify as many separate `--ignore-module` arguments as you want. For example running `dependency-check ./package.json --unused --ignore-module foo` will not tell you if the `foo` module was not used in your code. 
 
 ### --entry
 
