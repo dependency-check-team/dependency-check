@@ -194,9 +194,9 @@ function parse (opts) {
         })
       })
 
-      if (opts.builtins) return {package: pkg, used: Object.keys(used), builtins: core}
+      if (opts.builtins) return { package: pkg, used: Object.keys(used), builtins: core }
 
-      return {package: pkg, used: Object.keys(used)}
+      return { package: pkg, used: Object.keys(used) }
     })
 
   function resolveDep (file) {
