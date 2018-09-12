@@ -2,6 +2,11 @@
 
 'use strict'
 
+if (process.version.match(/^v(\d+)\./)[1] < 6) {
+  console.error('dependency-check: Node 6 or greater is required. `dependency-check` did not run.')
+  process.exit(0)
+}
+
 const check = require('./')
 
 const args = require('minimist')(process.argv.slice(2), {
