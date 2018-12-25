@@ -4,5 +4,6 @@ node_js:
   - '7'
   - '8'
   - '9'
-  - 'stable'
+  - '10'
+  - '11'
 sudo: false
