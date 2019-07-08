@@ -88,7 +88,10 @@ check({
       excludePeer: args.peer === false,
       ignore: [].concat(args.i || [])
     }
-    if (args.extra) {
+
+    const runAllTests = !args.extra && !args.missing
+
+    if (runAllTests || args.extra) {
       const extras = check.extra(pkg, deps, options)
       failed += extras.length
       if (extras.length) {
@@ -97,7 +100,7 @@ check({
         console.log('Success! All dependencies in package.json are used in the code')
       }
     }
-    if (args.missing || !args.extra) {
+    if (runAllTests || args.missing) {
       const missing = check.missing(pkg, deps, options)
       failed += missing.length
       if (missing.length) {

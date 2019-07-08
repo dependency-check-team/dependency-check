@@ -7,11 +7,12 @@
     "dependency-check": "cli.js"
   },
   "scripts": {
-    "check:dependencies": "node cli.js . && node cli.js . --missing --extra --no-dev -e js:detective-cjs",
+    "check:dependencies": "node cli.js . --no-dev",
     "check:node-versions": "installed-check --engine-check --no-version-check",
     "lint": "standard",
-    "test-cli:main-as-file": "node cli.js test/index.js",
+    "test-cli:custom-detective": "node cli.js test/ -e js:detective-cjs",
     "test-cli:glob": "node cli.js test/ --entry '**/*.js' --no-default-entries",
+    "test-cli:main-as-file": "node cli.js test/index.js",
     "test-cli:simple": "node cli.js test/",
     "test-cli": "npm-run-all --parallel test-cli:*",
     "test": "npm-run-all lint test-cli check:*"
