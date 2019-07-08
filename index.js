@@ -8,6 +8,7 @@ const resolveModule = require('resolve')
 const debug = require('debug')('dependency-check')
 const isRelative = require('is-relative')
 const globby = require('globby')
+const micromatch = require('micromatch')
 
 const promisedReadPackage = function (pkgPath) {
   return new Promise((resolve, reject) => {
@@ -52,7 +53,7 @@ module.exports.missing = function (pkg, deps, options) {
   const config = configure(pkg, options)
 
   deps.map(used => {
-    if (config.allDeps.indexOf(used) === -1 && config.ignore.indexOf(used) === -1) {
+    if (config.allDeps.indexOf(used) === -1 && !micromatch.isMatch(used, config.ignore)) {
       missing.push(used)
     }
   })
@@ -65,7 +66,7 @@ module.exports.extra = function (pkg, deps, options) {
   const config = configure(pkg, options)
 
   config.allDeps.map(dep => {
-    if (deps.indexOf(dep) === -1 && config.ignore.indexOf(dep) === -1) {
+    if (deps.indexOf(dep) === -1 && !micromatch.isMatch(dep, config.ignore)) {
       missing.push(dep)
     }
   })
