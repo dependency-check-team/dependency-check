@@ -7,7 +7,10 @@
     "dependency-check": "cli.js"
   },
   "scripts": {
-    "test": "standard && node cli.js test/ && node cli.js . && node cli.js . --missing --extra --no-dev -e js:detective-cjs"
+    "check-dependencies": "node cli.js . && node cli.js . --missing --extra --no-dev -e js:detective-cjs",
+    "lint": "standard",
+    "test-cli": "node cli.js test/",
+    "test": "npm-run-all lint test-cli check-dependencies"
   },
   "engines": {
     "node": ">=6.0.0"
@@ -25,6 +28,7 @@
   },
   "devDependencies": {
     "detective-cjs": "^3.0.0",
+    "npm-run-all": "^4.1.5",
     "standard": "^12.0.1"
   },
   "directories": {
