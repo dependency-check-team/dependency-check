@@ -40,7 +40,7 @@ if (args.help || args._.length === 0) {
   console.log("--no-peer             Won't tell you about peerDependencies that are missing or unused")
   console.log("--ignore-module, -i   Won't tell you about these module names when missing or unused")
   console.log('--entry               By default your main and bin entries from package.json will be parsed, but you can add more the list of entries by passing them in as --entry')
-  console.log("--no-default-entries  Won't parse your main and bin entries from package.json will be parsed")
+  console.log("--no-default-entries  Won't parse your main and bin entries from package.json")
   console.log('--detective           Requireable path containing an alternative implementation of the detective module that supports alternate syntaxes')
   console.log("--extensions, -e      List of file extensions with detective to use when resolving require paths. Eg. 'js,jsx:detective-es6'")
   console.log('--version             Show current version')
