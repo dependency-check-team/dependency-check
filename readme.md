@@ -17,7 +17,7 @@ dependency-check `2.x` supports Node.js 0.10 and later (Dev note: published usin
 
 ## how it works
 
-`dependency-check` parses your module code starting from the default entry files (e.g. `index.js` or `main` and any `bin` commands defined in package.json) and traverses through all relatively required JS files, ultimately producing a list of non-relative modules
+`dependency-check` parses your module code starting from the default entry files (e.g. `index.js` or `main` and any `bin` commands defined in package.json or if specific files has been defined, then those) and traverses through all relatively required JS files, ultimately producing a list of non-relative modules
 
 * **relative** - e.g. `require('./a-relative-file.js')`, if one of these are encountered the required file will be recursively parsed by the `dependency-check` algorithm
 * **non-relative** - e.g. `require('a-module')`, if one of these are encountered it will get added to the list of dependencies, but subdependencies of the module will not get recursively parsed
@@ -28,7 +28,7 @@ the goal of this module is to simply check that all non-relative modules that ge
 
 ```
 $ npm install dependency-check -g
-$ dependency-check <package.json file or module folder path>
+$ dependency-check <path to module file(s), package.json or module folder>
 
 # e.g.
 
@@ -36,6 +36,16 @@ $ dependency-check ./package.json
 Success! All dependencies used in the code are listed in package.json
 $ dependency-check ./package.json --unused
 Success! All dependencies in package.json are used in the code
+
+# or with file input instead:
+
+$ dependency-check ./index.js
+Success! All dependencies used in the code are listed in package.json
+
+# even with globs and multiple inputs:
+
+$ dependency-check ./test/**/*.js ./lib/*.js
+Success! All dependencies used in the code are listed in package.json
 ```
 
 `dependency-check` exits with code 1 if there are discrepancies, in addition to printing them out
@@ -64,15 +74,15 @@ ignores a module. This works for both `--unused` and `--missing`. You can specif
 
 ### --entry
 
-by default your `main` and `bin` entries from package.json will be parsed, but you can add more the list of entries by passing them in as `--entry`, e.g.:
+adds more files to be checked to any of the default ones already added, like `tests.js` to the default ones resolved from package.json:
 
 ```
 dependency-check package.json --entry tests.js
 ```
 
-in the above example `tests.js` will get added to the entries that get parsed + checked in addition to the defaults. You can specify as many separate `--entry` arguments as you want
+you can specify as many separate `--entry` arguments as you want. `--entry` also supports globbing like `**/*.js` and similar.
 
-you can also instead add additional entries directly after your package definition, like:
+you can also instead add additional entries directly after your main path, like:
 
 ```
 dependency-check package.json tests.js
@@ -80,7 +90,7 @@ dependency-check package.json tests.js
 
 ### --no-default-entries
 
-running `dependency-check package.json --no-default-entries --entry tests.js` won't parse any entries other than `tests.js`.  None of the entries from your package.json `main` and `bin` will be parsed
+running eg. `dependency-check package.json --no-default-entries --entry tests.js` won't add any default entries despite the main path given being one to a package.json or module folder. So only the `tests.js` file will be checked
 
 ### --extensions, -e
 
@@ -126,3 +136,4 @@ See [grunt-dependency-check](https://github.com/sindresorhus/grunt-dependency-ch
 
 - [detective](https://www.npmjs.org/package/detective) is used for parsing `require()` statements, which means it only does **static requires**. this means you should convert things like `var foo = "bar"; require(foo)` to be static, e.g. `require("bar")`
 - you can specify as many entry points as you like with multiple `--entry foo.js` arguments
+- use globbing to effectively add all the files you want to check

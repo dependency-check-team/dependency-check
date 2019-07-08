@@ -9,6 +9,7 @@ const debug = require('debug')('dependency-check')
 const isRelative = require('is-relative')
 const globby = require('globby')
 const micromatch = require('micromatch')
+const pkgUp = require('pkg-up')
 
 const promisedReadPackage = function (pkgPath) {
   return new Promise((resolve, reject) => {
@@ -19,20 +20,62 @@ const promisedReadPackage = function (pkgPath) {
   })
 }
 
+const resolveGlobbedPath = function (entries, cwd) {
+  const paths = []
+
+  if (typeof entries === 'string') entries = [entries]
+
+  debug('globby resolving', entries)
+
+  globby.sync(entries, {
+    cwd,
+    absolute: true,
+    expandDirectories: false
+  }).forEach(entry => {
+    // Globby yields unix-style paths.
+    const normalized = path.resolve(entry)
+
+    if (paths.indexOf(normalized) === -1) {
+      paths.push(normalized)
+    }
+  })
+
+  debug('globby resolved', paths)
+
+  return paths
+}
+
 module.exports = function (opts, cb) {
   let pkgPath = opts.path
+  let entries
+
   const result = promisedReadPackage(pkgPath)
     .catch(err => {
-      if (err && err.code === 'EISDIR') {
+      if (!err) {
+        return Promise.reject(new Error('Failed to read package.json, but received no error'))
+      } else if (pkgPath.endsWith('/package.json') || pkgPath === 'package.json') {
+        return Promise.reject(new Error('Failed to read package.json: ' + err.message))
+      } else if (err.code === 'EISDIR') {
         pkgPath = path.join(pkgPath, 'package.json')
         return promisedReadPackage(pkgPath)
       }
-      return Promise.reject(err)
+
+      // We've likely been given entries rather than a package.json or module path, try resolving that instead
+      entries = resolveGlobbedPath(pkgPath)
+
+      if (!entries[0]) {
+        return Promise.reject(new Error('Failed to find package.json, could not find any matching files'))
+      }
+
+      opts.noDefaultEntries = true
+      pkgPath = pkgUp.sync({ cwd: path.dirname(entries[0]) })
+
+      return promisedReadPackage(pkgPath)
     })
     .then(pkg => parse({
       path: pkgPath,
       package: pkg,
-      entries: opts.entries,
+      entries: (entries || []).concat(opts.entries),
       noDefaultEntries: opts.noDefaultEntries,
       builtins: opts.builtins,
       extensions: getExtensions(opts.extensions, opts.detective)
@@ -146,10 +189,12 @@ function parse (opts) {
   const extensions = opts.extensions
 
   const deps = {}
-  const paths = []
   const seen = []
   const core = []
   const mainPath = path.resolve(pkg.main || path.join(path.dirname(pkgPath), 'index.js'))
+
+  let paths = []
+
   if (!opts.noDefaultEntries && fs.existsSync(mainPath)) paths.push(mainPath)
 
   if (!opts.noDefaultEntries && pkg.bin) {
@@ -165,23 +210,9 @@ function parse (opts) {
 
   // pass in custom additional entries e.g. ['./test.js']
   if (opts.entries) {
-    if (typeof opts.entries === 'string') opts.entries = [opts.entries]
-
-    debug('globby resolving', opts.entries)
-
-    globby.sync(opts.entries, {
-      cwd: path.dirname(pkgPath),
-      absolute: true,
-      expandDirectories: false
-    }).forEach(entry => {
-      // Globby yields unix-style paths.
-      const normalized = path.resolve(entry)
-
-      if (paths.indexOf(normalized) === -1) {
-        debug('globby resolved', normalized)
-        paths.push(normalized)
-      }
-    })
+    paths = paths.concat(
+      resolveGlobbedPath(opts.entries, path.dirname(pkgPath))
+    )
   }
 
   debug('entry paths', paths)
