@@ -17,7 +17,7 @@
     "builtins": "^2.0.0",
     "debug": "^4.0.0",
     "detective": "^5.0.2",
-    "globby": "^8.0.1",
+    "globby": "^9.2.0",
     "is-relative": "^1.0.0",
     "minimist": "^1.2.0",
     "read-package-json": "^2.0.10",
