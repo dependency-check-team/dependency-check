@@ -35,7 +35,7 @@ const resolveGlobbedPath = function (entries, cwd) {
     // Globby yields unix-style paths.
     const normalized = path.resolve(entry)
 
-    if (paths.indexOf(normalized) === -1) {
+    if (!paths.includes(normalized)) {
       paths.push(normalized)
     }
   })
@@ -96,7 +96,7 @@ module.exports.missing = function (pkg, deps, options) {
   const config = configure(pkg, options)
 
   deps.map(used => {
-    if (config.allDeps.indexOf(used) === -1 && !micromatch.isMatch(used, config.ignore)) {
+    if (!config.allDeps.includes(used) && !micromatch.isMatch(used, config.ignore)) {
       missing.push(used)
     }
   })
@@ -109,7 +109,7 @@ module.exports.extra = function (pkg, deps, options) {
   const config = configure(pkg, options)
 
   config.allDeps.map(dep => {
-    if (deps.indexOf(dep) === -1 && !micromatch.isMatch(dep, config.ignore)) {
+    if (!deps.includes(dep) && !micromatch.isMatch(dep, config.ignore)) {
       missing.push(dep)
     }
   })
@@ -269,23 +269,23 @@ function parse (opts) {
         const requires = detective(contents)
         const relatives = []
         requires.map(req => {
-          const isCore = builtins.indexOf(req) > -1
+          const isCore = builtins.includes(req)
           if (isNotRelative(req) && !isCore) {
             // require('foo/bar') -> require('foo')
-            if (req[0] !== '@' && req.indexOf('/') > -1) req = req.split('/')[0]
+            if (req[0] !== '@' && req.includes('/')) req = req.split('/')[0]
             else if (req[0] === '@') req = req.split('/').slice(0, 2).join('/')
             debug('require("' + req + '")' + ' is a dependency')
             deps[req] = true
           } else {
             if (isCore) {
               debug('require("' + req + '")' + ' is core')
-              if (core.indexOf(req) === -1) {
+              if (!core.includes(req)) {
                 core.push(req)
               }
             } else {
               debug('require("' + req + '")' + ' is relative')
               req = path.resolve(path.dirname(file), req)
-              if (seen.indexOf(req) === -1) {
+              if (!seen.includes(req)) {
                 seen.push(req)
                 relatives.push(req)
               }
