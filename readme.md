@@ -32,25 +32,21 @@ $ dependency-check <path to module file(s), package.json or module folder>
 
 # e.g.
 
-$ dependency-check ./package.json
+$ dependency-check ./package.json --verbose
 Success! All dependencies used in the code are listed in package.json
 Success! All dependencies in package.json are used in the code
-$ dependency-check ./package.json --missing
+$ dependency-check ./package.json --missing --verbose
 Success! All dependencies used in the code are listed in package.json
-$ dependency-check ./package.json --unused
+$ dependency-check ./package.json --unused --verbose
 Success! All dependencies in package.json are used in the code
 
 # or with file input instead:
 
 $ dependency-check ./index.js
-Success! All dependencies used in the code are listed in package.json
-Success! All dependencies in package.json are used in the code
 
 # even with globs and multiple inputs:
 
 $ dependency-check ./test/**/*.js ./lib/*.js
-Success! All dependencies used in the code are listed in package.json
-Success! All dependencies in package.json are used in the code
 ```
 
 `dependency-check` exits with code 1 if there are discrepancies, in addition to printing them out
@@ -105,9 +101,9 @@ running `dependency-check ./package.json -e js,jsx:precinct` will resolve requir
 
 running `dependency-check ./package.json --detective precinct` will `require()` the local `precinct` as the default parser. This can be set per-extension using using `-e`. Defaults to parsing with [`detective`](https://www.npmjs.com/package/detective).
 
-### --quiet
+### --verbose
 
-Running with `--quiet` will diable the default log message on success, so that dependency-check only logs on failure.
+Running with `--verbose` will enable a log message on success, otherwise dependency-check only logs on failure.
 
 ### --help
 
