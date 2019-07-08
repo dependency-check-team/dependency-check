@@ -16,7 +16,7 @@
     "test": "npm-run-all lint test-cli check:*"
   },
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=10.0.0"
   },
   "author": "max ogden",
   "dependencies": {
