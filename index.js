@@ -166,6 +166,8 @@ function parse (opts) {
   if (opts.entries) {
     if (typeof opts.entries === 'string') opts.entries = [opts.entries]
 
+    debug('globby resolving', opts.entries)
+
     globby.sync(opts.entries, {
       cwd: path.dirname(pkgPath),
       absolute: true,
@@ -175,6 +177,7 @@ function parse (opts) {
       const normalized = path.resolve(entry)
 
       if (paths.indexOf(normalized) === -1) {
+        debug('globby resolved', normalized)
         paths.push(normalized)
       }
     })
