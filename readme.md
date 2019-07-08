@@ -34,6 +34,9 @@ $ dependency-check <path to module file(s), package.json or module folder>
 
 $ dependency-check ./package.json
 Success! All dependencies used in the code are listed in package.json
+Success! All dependencies in package.json are used in the code
+$ dependency-check ./package.json --missing
+Success! All dependencies used in the code are listed in package.json
 $ dependency-check ./package.json --unused
 Success! All dependencies in package.json are used in the code
 
@@ -41,24 +44,26 @@ Success! All dependencies in package.json are used in the code
 
 $ dependency-check ./index.js
 Success! All dependencies used in the code are listed in package.json
+Success! All dependencies in package.json are used in the code
 
 # even with globs and multiple inputs:
 
 $ dependency-check ./test/**/*.js ./lib/*.js
 Success! All dependencies used in the code are listed in package.json
+Success! All dependencies in package.json are used in the code
 ```
 
 `dependency-check` exits with code 1 if there are discrepancies, in addition to printing them out
 
 To always exit with code 0 pass `--ignore`
 
-### --missing (default)
+### --missing 
 
-running `dependency-check ./package.json` will check to make sure that all modules in your code are listed in your package.json
+running `dependency-check ./package.json --missing` will only do the check to make sure that all modules in your code are listed in your package.json
 
 ### --unused, --extra
 
-running `dependency-check ./package.json --unused` will do the inverse of the default missing check and will tell you which modules in your package.json dependencies **were not used** in your code
+running `dependency-check ./package.json --unused` will only do the inverse of the missing check and will tell you which modules in your package.json dependencies **were not used** in your code
 
 ### --no-dev
 
