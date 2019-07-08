@@ -9,7 +9,9 @@
   "scripts": {
     "check-dependencies": "node cli.js . && node cli.js . --missing --extra --no-dev -e js:detective-cjs",
     "lint": "standard",
-    "test-cli": "node cli.js test/",
+    "test-cli-glob": "node cli.js test/  --entry '**/*.js' --no-default-entries",
+    "test-cli-simple": "node cli.js test/",
+    "test-cli": "npm-run-all --parallel test-cli-glob test-cli-simple",
     "test": "npm-run-all lint test-cli check-dependencies"
   },
   "engines": {
