@@ -183,37 +183,48 @@ function isNotRelative (file) {
   return isRelative(file) && file[0] !== '.'
 }
 
-function parse (opts) {
+function resolveDefaultEntriesPaths (opts) {
   const pkgPath = opts.path
+  const pkgDir = path.dirname(pkgPath)
+  const pkg = opts.package
+
+  const mainPath = path.resolve(pkg.main || path.join(pkgDir, 'index.js'))
+
+  let paths = []
+
+  // Add the path of the main file
+  if (fs.existsSync(mainPath)) paths.push(mainPath)
+
+  // Add the path of binaries
+  if (pkg.bin) {
+    if (typeof pkg.bin === 'string') {
+    } else {
+      Object.keys(pkg.bin).forEach(cmdName => {
+        const cmd = pkg.bin[cmdName]
+        paths.push(path.resolve(path.join(pkgDir, cmd)))
+      })
+    }
+  }
+
+  return paths
+}
+
+function resolvePaths (opts) {
+  return [
+    ...(!opts.noDefaultEntries ? resolveDefaultEntriesPaths(opts) : []),
+    ...(opts.entries ? resolveGlobbedPath(opts.entries, path.dirname(opts.path)) : [])
+  ]
+}
+
+function parse (opts) {
   const pkg = opts.package
   const extensions = opts.extensions
 
   const deps = {}
   const seen = []
   const core = []
-  const mainPath = path.resolve(pkg.main || path.join(path.dirname(pkgPath), 'index.js'))
 
-  let paths = []
-
-  if (!opts.noDefaultEntries && fs.existsSync(mainPath)) paths.push(mainPath)
-
-  if (!opts.noDefaultEntries && pkg.bin) {
-    if (typeof pkg.bin === 'string') {
-      paths.push(path.resolve(path.join(path.dirname(pkgPath), pkg.bin)))
-    } else {
-      Object.keys(pkg.bin).forEach(cmdName => {
-        const cmd = pkg.bin[cmdName]
-        paths.push(path.resolve(path.join(path.dirname(pkgPath), cmd)))
-      })
-    }
-  }
-
-  // pass in custom additional entries e.g. ['./test.js']
-  if (opts.entries) {
-    paths = paths.concat(
-      resolveGlobbedPath(opts.entries, path.dirname(pkgPath))
-    )
-  }
+  const paths = resolvePaths(opts)
 
   debug('entry paths', paths)
 
