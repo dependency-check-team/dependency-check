@@ -42,43 +42,83 @@ async function resolveGlobbedPath (entries, cwd) {
   return paths
 }
 
-module.exports = async function (opts) {
-  let targetPath = opts.path
-  let pkgPath = targetPath
-  let entries = []
-  let pkg
+async function resolveModuleTarget (targetPath) {
+  let pkgPath, pkg
 
   try {
     pkg = await promisedReadPackage(targetPath)
+    pkgPath = targetPath
   } catch (err) {
     if (targetPath.endsWith('/package.json') || targetPath === 'package.json') {
       throw new Error('Failed to read package.json: ' + err.message)
     }
 
     if (err && err.code === 'EISDIR') {
+      // We were given a path to a module folder
       pkgPath = path.join(targetPath, 'package.json')
-    } else {
-      // We've likely been given entries rather than a package.json or module path, try resolving that instead
-      entries = await resolveGlobbedPath(pkgPath)
-
-      if (!entries[0]) {
-        throw new Error('Failed to find package.json, no files found')
-      }
-
-      opts.noDefaultEntries = true
-      pkgPath = await pkgUp({ cwd: path.dirname(entries[0]) })
+      pkg = await promisedReadPackage(pkgPath)
     }
-
-    pkg = await promisedReadPackage(pkgPath)
   }
 
+  if (!pkg) return undefined
+
+  return {
+    pkgPath,
+    pkg
+  }
+}
+
+async function resolveEntryTarget (targetPath) {
+  // We've been given an entry path pattern as the target rather than a package.json or module folder
+  // We'll resolve those entries and then finds us the package.json from the location of those
+  const targetEntries = await resolveGlobbedPath(targetPath)
+
+  if (!targetEntries[0]) {
+    throw new Error('Failed to find package.json, no file to resolve it from')
+  }
+
+  const pkgPath = await pkgUp({ cwd: path.dirname(targetEntries[0]) })
+
+  if (!pkgPath) {
+    throw new Error('Failed to find a package.json')
+  }
+
+  const pkg = await promisedReadPackage(pkgPath)
+
+  return {
+    pkgPath,
+    pkg,
+    targetEntries
+  }
+}
+
+module.exports = async function ({
+  builtins,
+  detective,
+  entries,
+  extensions,
+  noDefaultEntries,
+  path: targetPath
+}) {
+  if (!targetPath) throw new Error('Requires a path to be set')
+
+  const {
+    pkgPath,
+    pkg,
+    targetEntries
+  } = await resolveModuleTarget(targetPath) || await resolveEntryTarget(targetPath)
+
+  entries = targetEntries ? [...targetEntries, ...entries] : entries
+  extensions = getExtensions(extensions, detective)
+  noDefaultEntries = noDefaultEntries || (targetEntries && targetEntries.length !== 0)
+
   return parse({
-    path: pkgPath,
+    builtins,
+    entries,
+    extensions,
+    noDefaultEntries,
     package: pkg,
-    entries: entries.concat(opts.entries),
-    noDefaultEntries: opts.noDefaultEntries,
-    builtins: opts.builtins,
-    extensions: getExtensions(opts.extensions, opts.detective)
+    path: pkgPath
   })
 }
 
