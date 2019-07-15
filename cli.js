@@ -38,7 +38,6 @@ if (args.help || args._.length === 0) {
   console.log("--no-dev              Won't tell you about devDependencies that are missing or unused")
   console.log("--no-peer             Won't tell you about peerDependencies that are missing or unused")
   console.log("--ignore-module, -i   Won't tell you about these module names when missing or unused. Supports globbing")
-  console.log('--entry               If a package.json or module folder was set, then by default the main and bin entries in the package.json will be parsed, but you can add more the list of entries by passing them in as --entry. Supports globbing')
   console.log("--no-default-entries  Won't parse your main and bin entries from package.json even when a package.json or module folder has been defined")
   console.log('--detective           Requireable path containing an alternative implementation of the detective module that supports alternate syntaxes')
   console.log("--extensions, -e      List of file extensions with detective to use when resolving require paths. Eg. 'js,jsx:detective-es6'")
@@ -73,7 +72,7 @@ function extensions (arg) {
 
 check({
   path: args._.shift(),
-  entries: args._.concat(args.entry || []),
+  entries: args._,
   noDefaultEntries: !args['default-entries'],
   extensions: extensions(args.e),
   detective: args.detective
