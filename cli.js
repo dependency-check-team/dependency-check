@@ -12,14 +12,13 @@ const check = require('./')
 const args = require('minimist')(process.argv.slice(2), {
   default: {
     missing: false,
-    extra: false,
+    unused: false,
     dev: true,
     'default-entries': true,
     verbose: false
   },
-  boolean: ['missing', 'extra', 'dev', 'version', 'ignore', 'default-entries', 'verbose'],
+  boolean: ['missing', 'unused', 'dev', 'version', 'ignore', 'default-entries', 'verbose'],
   alias: {
-    extra: 'unused',
     'ignore-module': 'i',
     'extensions': 'e'
   }
@@ -35,7 +34,7 @@ if (args.help || args._.length === 0) {
 
   console.log('\nOptions:')
   console.log('--missing (default)   Check to make sure that all modules in your code are listed in your package.json')
-  console.log('--unused, --extra     The inverse of the --missing check and will tell you which modules in your package.json *were not* used in your code')
+  console.log('--unused              The inverse of the --missing check and will tell you which modules in your package.json *were not* used in your code')
   console.log("--no-dev              Won't tell you about devDependencies that are missing or unused")
   console.log("--no-peer             Won't tell you about peerDependencies that are missing or unused")
   console.log("--ignore-module, -i   Won't tell you about these module names when missing or unused. Supports globbing")
@@ -91,7 +90,7 @@ check({
 
     const runAllTests = !args.extra && !args.missing
 
-    if (runAllTests || args.extra) {
+    if (runAllTests || args.unused) {
       const extras = check.extra(pkg, deps, options)
       failed += extras.length
       if (extras.length) {
