@@ -62,7 +62,7 @@ module.exports = async function (opts) {
       entries = await resolveGlobbedPath(pkgPath)
 
       if (!entries[0]) {
-        throw new Error('Failed to find package.json, could not find any matching files')
+        throw new Error('Failed to find package.json, no files found')
       }
 
       opts.noDefaultEntries = true
