@@ -2,6 +2,7 @@
 
 const path = require('path')
 const fs = require('fs')
+const { promisify } = require('util')
 const readPackage = require('read-package-json')
 const builtins = require('module').builtinModules
 const resolveModule = require('resolve')
@@ -11,34 +12,30 @@ const globby = require('globby')
 const micromatch = require('micromatch')
 const pkgUp = require('pkg-up')
 
-const promisedReadPackage = function (pkgPath) {
-  return new Promise((resolve, reject) => {
-    readPackage(pkgPath, (err, pkg) => {
-      if (err) return reject(err)
-      resolve(pkg)
-    })
-  })
-}
+const promisedFsAccess = promisify(fs.access)
+const promisedReadPackage = promisify(readPackage)
 
-const resolveGlobbedPath = function (entries, cwd) {
-  const paths = []
-
+async function resolveGlobbedPath (entries, cwd) {
   if (typeof entries === 'string') entries = [entries]
 
   debug('globby resolving', entries)
 
-  globby.sync(entries, {
+  const resolvedEntries = await globby(entries, {
     cwd,
     absolute: true,
     expandDirectories: false
-  }).forEach(entry => {
+  })
+
+  const paths = Object.keys(resolvedEntries.reduce((result, entry) => {
     // Globby yields unix-style paths.
     const normalized = path.resolve(entry)
 
-    if (!paths.includes(normalized)) {
-      paths.push(normalized)
+    if (!result[normalized]) {
+      result[normalized] = true
     }
-  })
+
+    return result
+  }, {}))
 
   debug('globby resolved', paths)
 
@@ -50,7 +47,7 @@ module.exports = function (opts, cb) {
   let entries
 
   const result = promisedReadPackage(pkgPath)
-    .catch(err => {
+    .catch(async (err) => {
       if (!err) {
         return Promise.reject(new Error('Failed to read package.json, but received no error'))
       } else if (pkgPath.endsWith('/package.json') || pkgPath === 'package.json') {
@@ -61,7 +58,7 @@ module.exports = function (opts, cb) {
       }
 
       // We've likely been given entries rather than a package.json or module path, try resolving that instead
-      entries = resolveGlobbedPath(pkgPath)
+      entries = await resolveGlobbedPath(pkgPath)
 
       if (!entries[0]) {
         return Promise.reject(new Error('Failed to find package.json, could not find any matching files'))
@@ -187,7 +184,7 @@ function joinAndResolvePath (basePath, targetPath) {
   return path.resolve(path.join(basePath, targetPath))
 }
 
-function resolveDefaultEntriesPaths (opts) {
+async function resolveDefaultEntriesPaths (opts) {
   const pkgPath = opts.path
   const pkgDir = path.dirname(pkgPath)
   const pkg = opts.package
@@ -197,7 +194,10 @@ function resolveDefaultEntriesPaths (opts) {
   let paths = []
 
   // Add the path of the main file
-  if (fs.existsSync(mainPath)) paths.push(mainPath)
+  try {
+    await promisedFsAccess(mainPath)
+    paths.push(mainPath)
+  } catch (err) {}
 
   // Add the path of binaries
   if (pkg.bin) {
@@ -213,14 +213,22 @@ function resolveDefaultEntriesPaths (opts) {
   return paths
 }
 
-function resolvePaths (opts) {
+async function resolvePaths (opts) {
+  const [
+    defaultEntries,
+    globbedPaths
+  ] = await Promise.all([
+    !opts.noDefaultEntries ? await resolveDefaultEntriesPaths(opts) : [],
+    opts.entries ? await resolveGlobbedPath(opts.entries, path.dirname(opts.path)) : []
+  ])
+
   return [
-    ...(!opts.noDefaultEntries ? resolveDefaultEntriesPaths(opts) : []),
-    ...(opts.entries ? resolveGlobbedPath(opts.entries, path.dirname(opts.path)) : [])
+    ...defaultEntries,
+    ...globbedPaths
   ]
 }
 
-function parse (opts) {
+async function parse (opts) {
   const pkg = opts.package
   const extensions = opts.extensions
 
@@ -228,7 +236,7 @@ function parse (opts) {
   const seen = []
   const core = []
 
-  const paths = resolvePaths(opts)
+  const paths = await resolvePaths(opts)
 
   debug('entry paths', paths)
 
