@@ -57,7 +57,7 @@ To always exit with code 0 pass `--ignore`
 
 running `dependency-check ./package.json --missing` will only do the check to make sure that all modules in your code are listed in your package.json
 
-### --unused, --extra
+### --unused
 
 running `dependency-check ./package.json --unused` will only do the inverse of the missing check and will tell you which modules in your package.json dependencies **were not used** in your code
 
