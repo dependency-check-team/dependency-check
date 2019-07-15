@@ -201,14 +201,13 @@ function resolveDefaultEntriesPaths (opts) {
 
   // Add the path of binaries
   if (pkg.bin) {
-    if (typeof pkg.bin === 'string') {
-      paths.push(joinAndResolvePath(pkgDir, pkg.bin))
-    } else {
-      Object.keys(pkg.bin).forEach(cmdName => {
-        const cmd = pkg.bin[cmdName]
-        paths.push(joinAndResolvePath(pkgDir, cmd))
-      })
-    }
+    const binPaths = typeof pkg.bin === 'string'
+      ? [pkg.bin]
+      : Object.values(pkg.bin)
+
+    binPaths.forEach(cmd => {
+      paths.push(joinAndResolvePath(pkgDir, cmd))
+    })
   }
 
   return paths
