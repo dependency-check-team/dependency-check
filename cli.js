@@ -30,11 +30,11 @@ if (args.version) {
 }
 
 if (args.help || args._.length === 0) {
-  console.log('\nUsage: dependency-check <path to module files, package.json or module folder> <additional entries to add> <options>')
-
+  console.log('\nUsage: dependency-check <path to entry file, package.json or module folder> <additional entry paths to add> <options>')
+  console.log('\nEntry paths supports globbing for easy adding of eg. entire folders.')
   console.log('\nOptions:')
-  console.log('--missing (default)   Check to make sure that all modules in your code are listed in your package.json')
-  console.log('--unused              The inverse of the --missing check and will tell you which modules in your package.json *were not* used in your code')
+  console.log('--missing             Only check to make sure that all modules in your code are listed in your package.json')
+  console.log('--unused              Only check which modules listed in your package.json *are not* used in your code')
   console.log("--no-dev              Won't tell you about devDependencies that are missing or unused")
   console.log("--no-peer             Won't tell you about peerDependencies that are missing or unused")
   console.log("--ignore-module, -i   Won't tell you about these module names when missing or unused. Supports globbing")
@@ -44,7 +44,7 @@ if (args.help || args._.length === 0) {
   console.log("--extensions, -e      List of file extensions with detective to use when resolving require paths. Eg. 'js,jsx:detective-es6'")
   console.log('--version             Show current version')
   console.log('--ignore              To always exit with code 0 pass --ignore')
-  console.log('--verbose             Enable logging of success')
+  console.log('--verbose             Enable logging of eg. success message')
   console.log('')
 
   process.exit(1)
