@@ -183,12 +183,16 @@ function isNotRelative (file) {
   return isRelative(file) && file[0] !== '.'
 }
 
+function joinAndResolvePath (basePath, targetPath) {
+  return path.resolve(path.join(basePath, targetPath))
+}
+
 function resolveDefaultEntriesPaths (opts) {
   const pkgPath = opts.path
   const pkgDir = path.dirname(pkgPath)
   const pkg = opts.package
 
-  const mainPath = path.resolve(pkg.main || path.join(pkgDir, 'index.js'))
+  const mainPath = joinAndResolvePath(pkgDir, pkg.main || 'index.js')
 
   let paths = []
 
@@ -198,10 +202,11 @@ function resolveDefaultEntriesPaths (opts) {
   // Add the path of binaries
   if (pkg.bin) {
     if (typeof pkg.bin === 'string') {
+      paths.push(joinAndResolvePath(pkgDir, pkg.bin))
     } else {
       Object.keys(pkg.bin).forEach(cmdName => {
         const cmd = pkg.bin[cmdName]
-        paths.push(path.resolve(path.join(pkgDir, cmd)))
+        paths.push(joinAndResolvePath(pkgDir, cmd))
       })
     }
   }
