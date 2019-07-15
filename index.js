@@ -42,50 +42,44 @@ async function resolveGlobbedPath (entries, cwd) {
   return paths
 }
 
-module.exports = function (opts, cb) {
-  let pkgPath = opts.path
-  let entries
+module.exports = async function (opts) {
+  let targetPath = opts.path
+  let pkgPath = targetPath
+  let entries = []
+  let pkg
 
-  const result = promisedReadPackage(pkgPath)
-    .catch(async (err) => {
-      if (!err) {
-        return Promise.reject(new Error('Failed to read package.json, but received no error'))
-      } else if (pkgPath.endsWith('/package.json') || pkgPath === 'package.json') {
-        return Promise.reject(new Error('Failed to read package.json: ' + err.message))
-      } else if (err.code === 'EISDIR') {
-        pkgPath = path.join(pkgPath, 'package.json')
-        return promisedReadPackage(pkgPath)
-      }
+  try {
+    pkg = await promisedReadPackage(targetPath)
+  } catch (err) {
+    if (targetPath.endsWith('/package.json') || targetPath === 'package.json') {
+      throw new Error('Failed to read package.json: ' + err.message)
+    }
 
+    if (err && err.code === 'EISDIR') {
+      pkgPath = path.join(targetPath, 'package.json')
+    } else {
       // We've likely been given entries rather than a package.json or module path, try resolving that instead
       entries = await resolveGlobbedPath(pkgPath)
 
       if (!entries[0]) {
-        return Promise.reject(new Error('Failed to find package.json, could not find any matching files'))
+        throw new Error('Failed to find package.json, could not find any matching files')
       }
 
       opts.noDefaultEntries = true
-      pkgPath = pkgUp.sync({ cwd: path.dirname(entries[0]) })
+      pkgPath = await pkgUp({ cwd: path.dirname(entries[0]) })
+    }
 
-      return promisedReadPackage(pkgPath)
-    })
-    .then(pkg => parse({
-      path: pkgPath,
-      package: pkg,
-      entries: (entries || []).concat(opts.entries),
-      noDefaultEntries: opts.noDefaultEntries,
-      builtins: opts.builtins,
-      extensions: getExtensions(opts.extensions, opts.detective)
-    }))
-
-  if (cb) {
-    result
-      .then(value => { cb(null, value) })
-      .catch(err => { cb(err) })
-    return
+    pkg = await promisedReadPackage(pkgPath)
   }
 
-  return result
+  return parse({
+    path: pkgPath,
+    package: pkg,
+    entries: entries.concat(opts.entries),
+    noDefaultEntries: opts.noDefaultEntries,
+    builtins: opts.builtins,
+    extensions: getExtensions(opts.extensions, opts.detective)
+  })
 }
 
 module.exports.missing = function (pkg, deps, options) {
