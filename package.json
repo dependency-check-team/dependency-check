@@ -7,7 +7,9 @@
     "dependency-check": "cli.js"
   },
   "scripts": {
-    "test": "standard && node cli.js test/ && node cli.js . && node cli.js . --missing --extra --no-dev -e js:detective-cjs"
+    "test:lint": "standard",
+    "test:integration": "node cli.js test/ && node cli.js . && node cli.js . --missing --extra --no-dev -e js:detective-cjs",
+    "test": "npm run --silent test:lint && npm run --silent test:integration"
   },
   "author": "max ogden",
   "dependencies": {
