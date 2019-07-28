@@ -1,6 +1,11 @@
 language: node_js
 node_js:
-  - '10'
-  - '11'
   - '12'
+  - '11'
+  - '10'
+script: npm run check && npm run test-cli
 sudo: false
+jobs:
+  include:
+    - stage: linting
+      script: npm run lint
