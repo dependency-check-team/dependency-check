@@ -11,6 +11,8 @@ checks which modules you have used in your code and then makes sure they are lis
 
 ## requirements
 
+dependency-check `4.x` supports Node.js 10 and later
+
 dependency-check `3.x` supports Node.js 6 and later
 
 dependency-check `2.x` supports Node.js 0.10 and later (Dev note: published using the `legacy` tag)
