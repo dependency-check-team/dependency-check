@@ -3,9 +3,9 @@
 checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json, or vice-versa
 
 [![dat](https://img.shields.io/badge/Development%20sponsored%20by-dat-green.svg?style=flat)](http://dat-data.com/)
-[![Build Status](https://travis-ci.org/maxogden/dependency-check.svg?branch=master)](https://travis-ci.org/maxogden/dependency-check)
-[![dependencies Status](https://david-dm.org/maxogden/dependency-check/status.svg)](https://david-dm.org/maxogden/dependency-check)
-[![Known Vulnerabilities](https://snyk.io/test/github/maxogden/dependency-check/badge.svg?targetFile=package.json)](https://snyk.io/test/github/maxogden/dependency-check?targetFile=package.json)
+[![Build Status](https://travis-ci.com/dependency-check-team/dependency-check.svg?branch=master)](https://travis-ci.org/dependency-check-team/dependency-check)
+[![dependencies Status](https://david-dm.org/dependency-check-team/dependency-check/status.svg)](https://david-dm.org/dependency-check-team/dependency-check)
+[![Known Vulnerabilities](https://snyk.io/test/github/dependency-check-team/dependency-check/badge.svg?targetFile=package.json)](https://snyk.io/test/github/dependency-check-team/dependency-check?targetFile=package.json)
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 

@@ -41,11 +41,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maxogden/dependency-check.git"
+    "url": "git+https://github.com/dependency-check-team/dependency-check.git"
   },
   "bugs": {
-    "url": "https://github.com/maxogden/dependency-check/issues"
+    "url": "https://github.com/dependency-check-team/dependency-check/issues"
   },
-  "homepage": "https://github.com/maxogden/dependency-check",
+  "homepage": "https://github.com/dependency-check-team/dependency-check",
   "license": "BSD-3-Clause"
 }
