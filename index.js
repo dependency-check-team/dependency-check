@@ -205,8 +205,8 @@ function configure (pkg, options) {
   }
 
   return {
-    allDeps: allDeps,
-    ignore: ignore
+    allDeps,
+    ignore
   }
 }
 
