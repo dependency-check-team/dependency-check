@@ -99,8 +99,13 @@ check({
       }
     }
     if (runAllTests || args.missing) {
-      const missing = check.missing(pkg, deps, options)
+      const missing = check.missing(pkg, deps, Object.assign({}, options, {
+        excludeDev: false,
+        excludePeer: false
+      }))
+
       failed += missing.length
+
       if (missing.length) {
         console.error('Fail! Dependencies not listed in package.json: ' + missing.join(', '))
       } else if (args.verbose) {
