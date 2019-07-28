@@ -20,7 +20,7 @@ const args = require('minimist')(process.argv.slice(2), {
   boolean: ['missing', 'unused', 'dev', 'version', 'ignore', 'default-entries', 'verbose'],
   alias: {
     'ignore-module': 'i',
-    'extensions': 'e'
+    extensions: 'e'
   }
 })
 

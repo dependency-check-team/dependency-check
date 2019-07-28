@@ -225,7 +225,7 @@ async function resolveDefaultEntriesPaths (opts) {
 
   const mainPath = joinAndResolvePath(pkgDir, pkg.main || 'index.js')
 
-  let paths = []
+  const paths = []
 
   // Add the path of the main file
   try {
