@@ -9,11 +9,12 @@
   "scripts": {
     "check:dependencies": "node cli.js . && node cli.js . --missing --extra --no-dev -e js:detective-cjs",
     "check:node-versions": "installed-check --engine-check --no-version-check",
+    "check": "run-p check:*",
     "lint": "standard",
-    "test-cli-glob": "node cli.js test/  --entry '**/*.js' --no-default-entries",
-    "test-cli-simple": "node cli.js test/",
-    "test-cli": "npm-run-all --parallel test-cli-glob test-cli-simple",
-    "test": "npm-run-all lint test-cli check:*"
+    "test-cli:glob": "node cli.js test/  --entry '**/*.js' --no-default-entries",
+    "test-cli:simple": "node cli.js test/",
+    "test-cli": "run-p test-cli:*",
+    "test": "run-s lint test-cli check"
   },
   "engines": {
     "node": ">=6.0.0"

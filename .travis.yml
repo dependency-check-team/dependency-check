@@ -1,9 +1,19 @@
 language: node_js
 node_js:
-  - '6'
-  - '7'
-  - '8'
-  - '9'
-  - '10'
+  - '12'
   - '11'
+  - '10'
+  - '9'
+  - '8'
+  - '7'
+  - '6'
+script: npm run test-cli
 sudo: false
+jobs:
+  include:
+    - stage: linting
+      script: npm run lint
+    - stage: checks
+      script: npm run check
+    - stage: security
+      script: npm i --package-lock-only && npm audit
