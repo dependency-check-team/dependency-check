@@ -9,7 +9,7 @@ checks which modules you have used in your code and then makes sure they are lis
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-## requirements
+## requirements for maintained majors
 
 dependency-check `4.x` supports Node.js 10 and later
 
@@ -17,12 +17,14 @@ dependency-check `3.x` supports Node.js 6 and later
 
 dependency-check `2.x` supports Node.js 0.10 and later (Dev note: published using the `legacy` tag)
 
+For more info on maintenance status, see [SECURITY.md](./SECURITY.md).
+
 ## how it works
 
 `dependency-check` parses your module code starting from the default entry files (e.g. `index.js` or `main` and any `bin` commands defined in package.json or if specific files has been defined, then those) and traverses through all relatively required JS files, ultimately producing a list of non-relative modules
 
 * **relative** - e.g. `require('./a-relative-file.js')`, if one of these are encountered the required file will be recursively parsed by the `dependency-check` algorithm
-* **non-relative** - e.g. `require('a-module')`, if one of these are encountered it will get added to the list of dependencies, but subdependencies of the module will not get recursively parsed
+* **non-relative** - e.g. `require('a-module')`, if one of these are encountered it will get added to the list of dependencies, but sub-dependencies of the module will not get recursively parsed
 
 the goal of this module is to simply check that all non-relative modules that get `require()`'d are in package.json, which prevents people from getting 'module not found' errors when they install your module that has missing deps which was accidentally published to NPM (happened to me all the time, hence the impetus to write this module).
 
