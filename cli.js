@@ -99,10 +99,14 @@ check({
       }
     }
     if (runAllTests || args.missing) {
-      const missing = check.missing(pkg, deps, Object.assign({}, options, {
-        excludeDev: false,
-        excludePeer: false
-      }))
+      const optionsForMissingCheck = runAllTests
+        ? Object.assign({}, options, {
+          excludeDev: false,
+          excludePeer: false
+        })
+        : options
+
+      const missing = check.missing(pkg, deps, optionsForMissingCheck)
 
       failed += missing.length
 
