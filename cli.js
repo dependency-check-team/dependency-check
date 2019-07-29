@@ -2,8 +2,11 @@
 
 'use strict'
 
-if (process.version.match(/^v(\d+)\./)[1] < 6) {
-  console.error('dependency-check: Node 6 or greater is required. `dependency-check` did not run.')
+const requiredNodeEngineMinimum = parseInt(require('./package.json').engines.node.match(/^>=(\d+)\./)[1], 10)
+const currentNodeEngine = parseInt(process.version.match(/^v(\d+)\./)[1], 10)
+
+if (currentNodeEngine < requiredNodeEngineMinimum) {
+  console.error('dependency-check: Node ' + requiredNodeEngineMinimum + ' or greater is required. `dependency-check` did not run.')
   process.exit(0)
 }
 
