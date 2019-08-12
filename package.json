@@ -8,7 +8,7 @@
   },
   "scripts": {
     "check:dependencies": "node cli.js . --no-dev",
-    "check:node-versions": "installed-check --engine-check --no-version-check",
+    "check:node-versions": "installed-check --engine-check",
     "check": "run-p check:*",
     "lint": "standard",
     "test-cli:custom-detective": "node cli.js test/ -e js:detective-cjs",
