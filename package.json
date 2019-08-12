@@ -41,7 +41,7 @@
   "devDependencies": {
     "detective-cjs": "^3.0.0",
     "husky": "^3.0.0",
-    "installed-check": "^2.2.0",
+    "installed-check": "^3.0.0",
     "npm-run-all": "^4.1.5",
     "standard": "^13.1.0"
   },
