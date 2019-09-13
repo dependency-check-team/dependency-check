@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   lint:
-    name: Static code analysis / Linting
+    name: Linting
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -20,4 +20,4 @@ jobs:
     - name: npm install
       run: npm install
     - name: Linting
-      run: npm run check
+      run: npm run lint
