@@ -1,4 +1,4 @@
-name: Linting
+name: Static code analysis
 
 on: [push]
 
@@ -21,3 +21,21 @@ jobs:
       run: npm install
     - name: Linting
       run: npm run lint
+  misc:
+    name: All remaining static analysis
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node_version: [10]
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node_version }}
+      uses: actions/setup-node@v1
+      with:
+        version: ${{ matrix.node_version }}
+    - name: npm install
+      run: npm install
+    - name: Linting
+      run: npm run check
