@@ -12,7 +12,7 @@
     "check": "run-p check:*",
     "lint": "standard",
     "test-cli:custom-detective": "node cli.js test/ -e js:detective-cjs",
-    "test-cli:glob": "node cli.js 'test/**/*.js' --no-default-entries",
+    "test-cli:glob": "node cli.js \"test/**/*.js\" --no-default-entries",
     "test-cli:main-as-file": "node cli.js test/index.js",
     "test-cli:simple": "node cli.js test/",
     "test-cli": "run-p test-cli:*",
