@@ -30,7 +30,7 @@
   "dependencies": {
     "debug": "^4.0.0",
     "detective": "^5.0.2",
-    "globby": "^10.0.1",
+    "globby": "^11.0.0",
     "is-relative": "^1.0.0",
     "micromatch": "^4.0.2",
     "minimist": "^1.2.0",
