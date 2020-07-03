@@ -76,25 +76,9 @@ running `dependency-check ./package.json --unused --no-peer` will not tell you i
 
 ignores a module. This works for both `--unused` and `--missing`. You can specify as many separate `--ignore-module` arguments as you want. For example running `dependency-check ./package.json --unused --ignore-module foo` will not tell you if the `foo` module was not used in your code.  Supports globbing patterns through the use of [micromatch](https://www.npmjs.com/package/micromatch), so eg. `--ignore-module "@types/*" is possible`
 
-### --entry
-
-adds more files to be checked to any of the default ones already added, like `tests.js` to the default ones resolved from package.json:
-
-```
-dependency-check package.json --entry tests.js
-```
-
-you can specify as many separate `--entry` arguments as you want. `--entry` also supports globbing like `**/*.js` and similar.
-
-you can also instead add additional entries directly after your main path, like:
-
-```
-dependency-check package.json tests.js
-```
-
 ### --no-default-entries
 
-running eg. `dependency-check package.json --no-default-entries --entry tests.js` won't add any default entries despite the main path given being one to a package.json or module folder. So only the `tests.js` file will be checked
+running eg. `dependency-check package.json tests.js --no-default-entries` won't add any default entries despite the main path given being one to a package.json or module folder. So only the `tests.js` file will be checked
 
 ### --extensions, -e
 
@@ -139,5 +123,4 @@ See [grunt-dependency-check](https://github.com/sindresorhus/grunt-dependency-ch
 ## protips
 
 - [detective](https://www.npmjs.org/package/detective) is used for parsing `require()` statements, which means it only does **static requires**. this means you should convert things like `var foo = "bar"; require(foo)` to be static, e.g. `require("bar")`
-- you can specify as many entry points as you like with multiple `--entry foo.js` arguments
 - use globbing to effectively add all the files you want to check
