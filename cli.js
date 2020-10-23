@@ -104,9 +104,9 @@ check({
     if (runAllTests || args.missing) {
       const optionsForMissingCheck = runAllTests
         ? Object.assign({}, options, {
-          excludeDev: false,
-          excludePeer: false
-        })
+            excludeDev: false,
+            excludePeer: false
+          })
         : options
 
       const missing = check.missing(pkg, deps, optionsForMissingCheck)
