@@ -2,7 +2,8 @@
 
 checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json, or vice-versa
 
-[![Build Status](https://travis-ci.com/dependency-check-team/dependency-check.svg?branch=master)](https://travis-ci.com/dependency-check-team/dependency-check)
+![Node CI](https://github.com/dependency-check-team/dependency-check/workflows/Node%20CI/badge.svg)
+![Static code analysis](https://github.com/dependency-check-team/dependency-check/workflows/Static%20code%20analysis/badge.svg)
 [![dependencies Status](https://david-dm.org/dependency-check-team/dependency-check/status.svg)](https://david-dm.org/dependency-check-team/dependency-check)
 [![Known Vulnerabilities](https://snyk.io/test/github/dependency-check-team/dependency-check/badge.svg?targetFile=package.json)](https://snyk.io/test/github/dependency-check-team/dependency-check?targetFile=package.json)
 
