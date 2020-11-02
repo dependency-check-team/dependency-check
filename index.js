@@ -16,6 +16,11 @@ const micromatch = require('micromatch')
 const pkgUp = require('pkg-up')
 
 const promisedReadPackage = promisify(readPackage)
+/**
+ * @param {string} file
+ * @param {import('resolve').AsyncOpts} options
+ * @returns {Promise<string>}
+ */
 const promisedResolveModule = (file, options) => new Promise((resolve, reject) => {
   resolveModule(file, options, (err, path) => {
     if (err) return reject(err)
@@ -23,6 +28,11 @@ const promisedResolveModule = (file, options) => new Promise((resolve, reject) =
   })
 })
 
+/**
+ * @param {string|string[]} entries
+ * @param {string} [cwd]
+ * @returns {Promise<string[]>}
+ */
 async function resolveGlobbedPath (entries, cwd) {
   if (typeof entries === 'string') entries = [entries]
 
@@ -50,6 +60,10 @@ async function resolveGlobbedPath (entries, cwd) {
   return paths
 }
 
+/**
+ * @param {string} targetPath
+ * @returns {Promise<undefined|{ pkgPath: string, pkg: import('type-fest').PackageJson, targetEntries?: never}>}
+ */
 async function resolveModuleTarget (targetPath) {
   let pkgPath, pkg
 
@@ -68,7 +82,7 @@ async function resolveModuleTarget (targetPath) {
     }
   }
 
-  if (!pkg) return undefined
+  if (!pkg || !pkgPath) return undefined
 
   return {
     pkgPath,
@@ -76,6 +90,10 @@ async function resolveModuleTarget (targetPath) {
   }
 }
 
+/**
+ * @param {string} targetPath
+ * @returns {Promise<undefined|{ pkgPath: string, pkg: import('type-fest').PackageJson, targetEntries: string[]}>}
+ */
 async function resolveEntryTarget (targetPath) {
   // We've been given an entry path pattern as the target rather than a package.json or module folder
   // We'll resolve those entries and then finds us the package.json from the location of those
@@ -100,6 +118,11 @@ async function resolveEntryTarget (targetPath) {
   }
 }
 
+/** @typedef {Omit<ParseOptions, 'path'> & { path: string }} DependencyCheckOptions */
+
+/**
+ * @param {DependencyCheckOptions} options
+ */
 module.exports = async function ({
   builtins,
   detective,
@@ -114,7 +137,7 @@ module.exports = async function ({
     pkgPath,
     pkg,
     targetEntries
-  } = await resolveModuleTarget(targetPath) || await resolveEntryTarget(targetPath)
+  } = await resolveModuleTarget(targetPath) || await resolveEntryTarget(targetPath) || {}
 
   entries = targetEntries ? [...targetEntries, ...entries] : entries
   extensions = getExtensions(extensions, detective)
@@ -156,6 +179,12 @@ module.exports.extra = function (pkg, deps, options) {
   return missing
 }
 
+/** @typedef {() => string[]} Detective */
+
+/**
+ * @param {Detective|string|undefined} name
+ * @returns {Detective|undefined}
+ */
 function getDetective (name) {
   try {
     return name
@@ -164,10 +193,18 @@ function getDetective (name) {
   } catch (e) {}
 }
 
+/** @type {Detective} */
 function noopDetective () {
   return []
 }
 
+/** @typedef {string[]|{ [extension: string]: Detective | undefined }} Extensions */
+
+/**
+ * @param {Extensions|undefined} extensions
+ * @param {Detective|string} detective
+ * @returns {{ [extension: string]: Detective }}
+ */
 function getExtensions (extensions, detective) {
   // Initialize extensions with node.js default handlers.
   const result = {
@@ -190,7 +227,7 @@ function getExtensions (extensions, detective) {
   // done to defer loading detective when not needed and to keep `.js` first in
   // the order of `Object.keys` (matching node.js behavior).
   if (result['.js'] === noopDetective) {
-    result['.js'] = getDetective(detective)
+    result['.js'] = getDetective(detective) || noopDetective
   }
 
   return result
@@ -222,6 +259,10 @@ function joinAndResolvePath (basePath, targetPath) {
   return path.resolve(path.join(basePath, targetPath))
 }
 
+/**
+ * @param {ParseOptions} opts
+ * @returns {Promise<string[]>}
+ */
 async function resolveDefaultEntriesPaths (opts) {
   const pkgPath = opts.path
   const pkgDir = path.dirname(pkgPath)
@@ -251,6 +292,10 @@ async function resolveDefaultEntriesPaths (opts) {
   return paths
 }
 
+/**
+ * @param {ParseOptions} opts
+ * @returns {Promise<string[]>}
+ */
 async function resolvePaths (opts) {
   const [
     defaultEntries,
@@ -266,6 +311,20 @@ async function resolvePaths (opts) {
   ]
 }
 
+/**
+ * @typedef ParseOptions
+ * @property {string} path
+ * @property {import('type-fest').PackageJson} package
+ * @property {string[]} [entries]
+ * @property {boolean} [noDefaultEntries]
+ * @property {Extensions} [extensions]
+ * @property {Detective|string} [detective]
+ * @property {boolean} [builtins]
+ */
+
+/**
+ * @param {ParseOptions} opts
+ */
 async function parse (opts) {
   const pkg = opts.package
   const extensions = opts.extensions
