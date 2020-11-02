@@ -201,7 +201,6 @@ function configure (pkg, options) {
 
   const allDeps = [
     ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.peerDependencies || {}),
     ...(options.excludePeer ? [] : Object.keys(pkg.peerDependencies || {})),
     ...(options.excludeDev ? [] : Object.keys(pkg.devDependencies || {}))
   ]
