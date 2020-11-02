@@ -1,7 +1,10 @@
 'use strict'
 
 const path = require('path')
-const fs = require('fs')
+const {
+  access: promisedFsAccess,
+  readFile
+} = require('fs').promises
 const { promisify } = require('util')
 const readPackage = require('read-package-json')
 const builtins = require('module').builtinModules
@@ -12,8 +15,13 @@ const globby = require('globby')
 const micromatch = require('micromatch')
 const pkgUp = require('pkg-up')
 
-const promisedFsAccess = promisify(fs.access)
 const promisedReadPackage = promisify(readPackage)
+const promisedResolveModule = (file, options) => new Promise((resolve, reject) => {
+  resolveModule(file, options, (err, path) => {
+    if (err) return reject(err)
+    resolve(path)
+  })
+})
 
 async function resolveGlobbedPath (entries, cwd) {
   if (typeof entries === 'string') entries = [entries]
@@ -169,13 +177,13 @@ function getExtensions (extensions, detective) {
   }
 
   if (Array.isArray(extensions)) {
-    extensions.forEach(extension => {
+    for (const extension of extensions) {
       result[extension] = getDetective(detective)
-    })
+    }
   } else if (typeof extensions === 'object') {
-    Object.keys(extensions).forEach(extension => {
+    for (const extension in extensions) {
       result[extension] = getDetective(extensions[extension] || detective)
-    })
+    }
   }
 
   // Reset the `detective` instance for `.js` when it hasn't been set. This is
@@ -191,18 +199,15 @@ function getExtensions (extensions, detective) {
 function configure (pkg, options) {
   options = options || {}
 
-  let allDeps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.peerDependencies || {}))
-  let ignore = options.ignore || []
-
-  if (typeof ignore === 'string') ignore = [ignore]
-
-  if (!options.excludePeer) {
-    allDeps = allDeps.concat(Object.keys(pkg.peerDependencies || {}))
-  }
-
-  if (!options.excludeDev) {
-    allDeps = allDeps.concat(Object.keys(pkg.devDependencies || {}))
-  }
+  const allDeps = [
+    ...Object.keys(pkg.dependencies || {}),
+    ...Object.keys(pkg.peerDependencies || {}),
+    ...(options.excludePeer ? [] : Object.keys(pkg.peerDependencies || {})),
+    ...(options.excludeDev ? [] : Object.keys(pkg.devDependencies || {}))
+  ]
+  const ignore = typeof options.ignore === 'string'
+    ? [options.ignore]
+    : (options.ignore || [])
 
   return {
     allDeps,
@@ -239,9 +244,9 @@ async function resolveDefaultEntriesPaths (opts) {
       ? [pkg.bin]
       : Object.values(pkg.bin)
 
-    binPaths.forEach(cmd => {
+    for (const cmd of binPaths) {
       paths.push(joinAndResolvePath(pkgDir, cmd))
-    })
+    }
   }
 
   return paths
@@ -252,8 +257,8 @@ async function resolvePaths (opts) {
     defaultEntries,
     globbedPaths
   ] = await Promise.all([
-    !opts.noDefaultEntries ? await resolveDefaultEntriesPaths(opts) : [],
-    opts.entries ? await resolveGlobbedPath(opts.entries, path.dirname(opts.path)) : []
+    !opts.noDefaultEntries ? resolveDefaultEntriesPaths(opts) : [],
+    opts.entries ? resolveGlobbedPath(opts.entries, path.dirname(opts.path)) : []
   ])
 
   return [
@@ -276,39 +281,36 @@ async function parse (opts) {
 
   if (paths.length === 0) return Promise.reject(new Error('No entry paths found'))
 
-  return Promise.all(paths.map(file => resolveDep(file)))
-    .then(allDeps => {
-      const used = {}
-      // merge all deps into one unique list
-      allDeps.forEach(deps => {
-        Object.keys(deps).forEach(dep => {
-          used[dep] = true
-        })
-      })
+  const allDeps = await Promise.all(paths.map(file => resolveDep(file)))
 
-      if (opts.builtins) return { package: pkg, used: Object.keys(used), builtins: core }
-
-      return { package: pkg, used: Object.keys(used) }
-    })
-
-  function resolveDep (file) {
-    if (isNotRelative(file)) {
-      return Promise.resolve(null)
+  const used = new Set()
+  // merge all deps into one unique list
+  for (const deps of allDeps) {
+    for (const dep in deps) {
+      used.add(dep)
     }
-
-    return new Promise((resolve, reject) => {
-      resolveModule(file, {
-        basedir: path.dirname(file),
-        extensions: Object.keys(extensions)
-      }, (err, path) => {
-        if (err) return reject(err)
-        resolve(path)
-      })
-    })
-      .then(path => getDeps(path))
   }
 
-  function getDeps (file) {
+  return {
+    package: pkg,
+    used: Array.from(used),
+    ...(opts.builtins ? { builtins: core } : {})
+  }
+
+  async function resolveDep (file) {
+    if (isNotRelative(file)) {
+      return null
+    }
+
+    const resolvedPath = await promisedResolveModule(file, {
+      basedir: path.dirname(file),
+      extensions: Object.keys(extensions)
+    })
+
+    return getDeps(resolvedPath)
+  }
+
+  async function getDeps (file) {
     const ext = path.extname(file)
     const detective = extensions[ext] || extensions['.js']
 
@@ -316,43 +318,37 @@ async function parse (opts) {
       return Promise.reject(new Error('Detective function missing for "' + file + '"'))
     }
 
-    return new Promise((resolve, reject) => {
-      fs.readFile(file, 'utf8', (err, contents) => {
-        if (err) return reject(err)
-        resolve(contents)
-      })
-    })
-      .then(contents => {
-        const requires = detective(contents)
-        const relatives = []
+    const contents = await readFile(file, 'utf8')
+    const requires = detective(contents)
+    const relatives = []
 
-        for (let req of requires) {
-          const isCore = builtins.includes(req)
-          if (isNotRelative(req) && !isCore) {
-            // require('foo/bar') -> require('foo')
-            if (req[0] !== '@' && req.includes('/')) req = req.split('/')[0]
-            else if (req[0] === '@') req = req.split('/').slice(0, 2).join('/')
-            debug('require("' + req + '")' + ' is a dependency')
-            deps[req] = true
-          } else {
-            if (isCore) {
-              debug('require("' + req + '")' + ' is core')
-              if (!core.includes(req)) {
-                core.push(req)
-              }
-            } else {
-              debug('require("' + req + '")' + ' is relative')
-              req = path.resolve(path.dirname(file), req)
-              if (!seen.includes(req)) {
-                seen.push(req)
-                relatives.push(req)
-              }
-            }
+    for (let req of requires) {
+      const isCore = builtins.includes(req)
+      if (isNotRelative(req) && !isCore) {
+        // require('foo/bar') -> require('foo')
+        if (req[0] !== '@' && req.includes('/')) req = req.split('/')[0]
+        else if (req[0] === '@') req = req.split('/').slice(0, 2).join('/')
+        debug('require("' + req + '")' + ' is a dependency')
+        deps[req] = true
+      } else {
+        if (isCore) {
+          debug('require("' + req + '")' + ' is core')
+          if (!core.includes(req)) {
+            core.push(req)
+          }
+        } else {
+          debug('require("' + req + '")' + ' is relative')
+          req = path.resolve(path.dirname(file), req)
+          if (!seen.includes(req)) {
+            seen.push(req)
+            relatives.push(req)
           }
         }
+      }
+    }
 
-        return Promise.all(relatives.map(name => resolveDep(name)))
-          .then(() => deps)
-      })
+    await Promise.all(relatives.map(name => resolveDep(name)))
+
+    return deps
   }
 }
