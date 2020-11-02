@@ -1,1 +1,1 @@
-var foo = require('./foo.js') // eslint-disable-line no-unused-vars
+const foo = require('./foo.js') // eslint-disable-line no-unused-vars

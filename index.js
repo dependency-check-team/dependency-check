@@ -126,11 +126,11 @@ module.exports.missing = function (pkg, deps, options) {
   const missing = []
   const config = configure(pkg, options)
 
-  deps.map(used => {
+  for (const used of deps) {
     if (!config.allDeps.includes(used) && !micromatch.isMatch(used, config.ignore)) {
       missing.push(used)
     }
-  })
+  }
 
   return missing
 }
@@ -139,11 +139,11 @@ module.exports.extra = function (pkg, deps, options) {
   const missing = []
   const config = configure(pkg, options)
 
-  config.allDeps.map(dep => {
+  for (const dep of config.allDeps) {
     if (!deps.includes(dep) && !micromatch.isMatch(dep, config.ignore)) {
       missing.push(dep)
     }
-  })
+  }
 
   return missing
 }
@@ -325,7 +325,8 @@ async function parse (opts) {
       .then(contents => {
         const requires = detective(contents)
         const relatives = []
-        requires.map(req => {
+
+        for (let req of requires) {
           const isCore = builtins.includes(req)
           if (isNotRelative(req) && !isCore) {
             // require('foo/bar') -> require('foo')
@@ -348,7 +349,7 @@ async function parse (opts) {
               }
             }
           }
-        })
+        }
 
         return Promise.all(relatives.map(name => resolveDep(name)))
           .then(() => deps)
