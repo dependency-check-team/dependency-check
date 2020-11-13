@@ -34,12 +34,12 @@ async function resolveGlobbedPath (entries, cwd) {
     expandDirectories: false
   })
 
-  const paths = Object.keys(resolvedEntries.reduce((result, entry) => {
+  const paths = Object.values(resolvedEntries.reduce((result, entry) => {
     // Globby yields unix-style paths.
     const normalized = path.resolve(entry)
 
     if (!result[normalized]) {
-      result[normalized] = true
+      result[normalized] = entry
     }
 
     return result

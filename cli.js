@@ -52,6 +52,10 @@ if (args.help || args._.length === 0) {
   process.exit(1)
 }
 
+// windows leaves leading/trailing quotes on strings needed on unix to
+// stop shells from doing path expansion, so strip them if present
+args._ = args._.map(stripQuotes)
+
 function extensions (arg) {
   if (!arg) return undefined
   const extensions = {}
@@ -71,6 +75,10 @@ function extensions (arg) {
   }
 
   return extensions
+}
+
+function stripQuotes (string) {
+  return string.replace(/(^'|")|('|"$)/g, '')
 }
 
 check({
