@@ -29,12 +29,12 @@
   "author": "max ogden",
   "dependencies": {
     "debug": "^4.0.0",
-    "detective": "^5.0.2",
     "globby": "^11.0.0",
     "is-relative": "^1.0.0",
     "micromatch": "^4.0.2",
     "minimist": "^1.2.0",
     "pkg-up": "^3.1.0",
+    "precinct": "^6.3.1",
     "read-package-json": "^3.0.0",
     "resolve": "^1.1.7"
   },

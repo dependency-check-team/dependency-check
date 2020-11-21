@@ -160,7 +160,7 @@ function getDetective (name) {
   try {
     return name
       ? (typeof name === 'string' ? require(name) : name)
-      : require('detective')
+      : require('precinct')
   } catch (e) {}
 }
 
