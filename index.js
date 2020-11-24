@@ -26,6 +26,9 @@ const promisedResolveModule = (file, options) => new Promise((resolve, reject) =
 async function resolveGlobbedPath (entries, cwd) {
   if (typeof entries === 'string') entries = [entries]
 
+  // replace backslashes for forward slashes for windows
+  entries = entries.map(entry => entry.replace(/\\/g, '/'))
+
   debug('globby resolving', entries)
 
   const resolvedEntries = await globby(entries, {
@@ -34,12 +37,12 @@ async function resolveGlobbedPath (entries, cwd) {
     expandDirectories: false
   })
 
-  const paths = Object.values(resolvedEntries.reduce((result, entry) => {
+  const paths = Object.keys(resolvedEntries.reduce((result, entry) => {
     // Globby yields unix-style paths.
     const normalized = path.resolve(entry)
 
     if (!result[normalized]) {
-      result[normalized] = entry
+      result[normalized] = true
     }
 
     return result
