@@ -78,7 +78,9 @@ function extensions (arg) {
 }
 
 function stripQuotes (string) {
-  return string.replace(/(^'|")|('|"$)/g, '')
+  if (string.startsWith("'") || string.startsWith('"')) string = string.slice(1);
+  if (string.endsWith("'") || string.endsWith('"')) string = string.slice(0, -1);
+  return string;
 }
 
 check({
