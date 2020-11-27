@@ -6,6 +6,7 @@ const {
   readFile
 } = require('fs').promises
 const { promisify } = require('util')
+// @ts-ignore
 const readPackage = require('read-package-json')
 const builtins = require('module').builtinModules
 const resolveModule = require('resolve')
@@ -17,6 +18,8 @@ const pkgUp = require('pkg-up')
 const VError = require('verror')
 
 const promisedReadPackage = promisify(readPackage)
+
+/** @type {(file: string, options: import('resolve').AsyncOpts) => Promise<string>} */
 const promisedResolveModule = (file, options) => new Promise((resolve, reject) => {
   resolveModule(file, options, (err, path) => {
     if (err) return reject(err)
@@ -24,9 +27,14 @@ const promisedResolveModule = (file, options) => new Promise((resolve, reject) =
   })
 })
 
-/** @typedef {() => string[]} Detective */
-/** @typedef {string[]|{ [extension: string]: Detective | undefined }} Extensions */
+/** @typedef {(contents: string) => string[]} Detective */
+/** @typedef {{ [extension: string]: Detective | undefined }} Extensions */
 
+/**
+ * @param {string|string[]} entries
+ * @param {string} cwd
+ * @returns {Promise<string[]>}
+ */
 const resolveGlobbedPath = async function (entries, cwd) {
   if (typeof entries === 'string') entries = [entries]
 
@@ -46,7 +54,6 @@ const resolveGlobbedPath = async function (entries, cwd) {
   for (const entry of resolvedEntries) {
     // Globby yields unix-style paths.
     const normalized = path.resolve(entry)
-
     paths.add(normalized)
   }
 
@@ -57,6 +64,10 @@ const resolveGlobbedPath = async function (entries, cwd) {
   return pathsArray
 }
 
+/**
+ * @param {string} targetPath
+ * @returns {Promise<undefined|{ pkgPath: string, pkg: import('type-fest').PackageJson, targetEntries?: never}>}
+ */
 const resolveModuleTarget = async function (targetPath) {
   let pkgPath, pkg
 
@@ -75,7 +86,7 @@ const resolveModuleTarget = async function (targetPath) {
     }
   }
 
-  if (!pkg) return
+  if (!pkg || !pkgPath) return
 
   return {
     pkgPath,
@@ -83,10 +94,14 @@ const resolveModuleTarget = async function (targetPath) {
   }
 }
 
+/**
+ * @param {string} targetPath
+ * @returns {Promise<undefined|{ pkgPath: string, pkg: import('type-fest').PackageJson, targetEntries: string[]}>}
+ */
 const resolveEntryTarget = async function (targetPath) {
   // We've been given an entry path pattern as the target rather than a package.json or module folder
   // We'll resolve those entries and then finds us the package.json from the location of those
-  const targetEntries = await resolveGlobbedPath(targetPath)
+  const targetEntries = await resolveGlobbedPath(targetPath, process.cwd())
 
   if (!targetEntries[0]) {
     throw new Error('Failed to find package.json, no file to resolve it from')
@@ -94,11 +109,9 @@ const resolveEntryTarget = async function (targetPath) {
 
   const pkgPath = await pkgUp({ cwd: path.dirname(targetEntries[0]) })
 
-  if (!pkgPath) {
-    throw new Error('Failed to find a package.json')
-  }
+  const pkg = pkgPath && await promisedReadPackage(pkgPath)
 
-  const pkg = await promisedReadPackage(pkgPath)
+  if (!pkg || !pkgPath) return
 
   return {
     pkgPath,
@@ -108,19 +121,18 @@ const resolveEntryTarget = async function (targetPath) {
 }
 
 /**
- * @typedef ParseOptions
+ * @typedef CheckOptions
  * @property {string} path
  * @property {string[]} [entries]
  * @property {boolean} [noDefaultEntries]
- * @property {Extensions} [extensions]
+ * @property {Extensions|string[]} [extensions]
  * @property {Detective|string} [detective]
  * @property {boolean} [builtins]
  */
 
-// FIXME: Define response
 /**
- * @param {ParseOptions} opts
- * @returns {Promise<any>}
+ * @param {CheckOptions} opts
+ * @returns {Promise<ParseResult>}
  */
 const check = async function ({
   builtins,
@@ -136,22 +148,28 @@ const check = async function ({
     pkgPath,
     pkg,
     targetEntries
-  } = await resolveModuleTarget(targetPath) || await resolveEntryTarget(targetPath)
+  } = await resolveModuleTarget(targetPath) || await resolveEntryTarget(targetPath) || {}
 
-  entries = targetEntries ? [...targetEntries, ...(entries || [])] : entries
-  extensions = getExtensions(extensions, detective)
-  noDefaultEntries = noDefaultEntries || (targetEntries && targetEntries.length !== 0)
+  if (!pkg || !pkgPath) {
+    throw new Error('Failed to find a package.json')
+  }
 
   return parse({
     builtins,
-    entries,
-    extensions,
-    noDefaultEntries,
+    entries: [...(targetEntries || []), ...(entries || [])],
+    extensions: getExtensions(extensions, detective),
+    noDefaultEntries: noDefaultEntries || (targetEntries && targetEntries.length !== 0),
     'package': pkg,
     path: pkgPath
   })
 }
 
+/**
+ * @param {import('type-fest').PackageJson} pkg
+ * @param {string[]} deps
+ * @param {DependencyOptions} [options]
+ * @returns {string[]}
+ */
 const missing = function (pkg, deps, options) {
   const missing = []
   const config = configure(pkg, options)
@@ -165,6 +183,12 @@ const missing = function (pkg, deps, options) {
   return missing
 }
 
+/**
+ * @param {import('type-fest').PackageJson} pkg
+ * @param {string[]} deps
+ * @param {DependencyOptions} [options]
+ * @returns {string[]}
+ */
 const extra = function (pkg, deps, options) {
   const missing = []
   const config = configure(pkg, options)
@@ -178,8 +202,10 @@ const extra = function (pkg, deps, options) {
   return missing
 }
 
-module.exports = Object.assign(check, { missing, extra })
-
+/**
+ * @param {string|Detective} [name]
+ * @returns {Detective}
+ */
 const getDetective = function (name) {
   try {
     return name
@@ -191,10 +217,17 @@ const getDetective = function (name) {
   }
 }
 
+/** @type {Detective} */
 const noopDetective = () => []
 
+/**
+ * @param {string[]|Extensions|undefined} extensions
+ * @param {string|Detective|undefined} detective
+ * @returns {Extensions}
+ */
 const getExtensions = function (extensions, detective) {
   // Initialize extensions with node.js default handlers.
+  /** @type {Extensions} */
   const result = {
     '.js': noopDetective,
     '.node': noopDetective,
@@ -221,9 +254,19 @@ const getExtensions = function (extensions, detective) {
   return result
 }
 
-const configure = function (pkg, options) {
-  options = options || {}
+/**
+ * @typedef DependencyOptions
+ * @property {boolean} [excludeDev]
+ * @property {boolean} [excludePeer]
+ * @property {string|string[]} [ignore]
+ */
 
+/**
+ * @param {import('type-fest').PackageJson} pkg
+ * @param {DependencyOptions} [options]
+ * @returns {{ allDeps: string[], ignore: string[] }}
+ */
+const configure = function (pkg, options = {}) {
   const allDeps = [
     ...Object.keys(pkg.dependencies || {}),
     ...(options.excludePeer ? [] : Object.keys(pkg.peerDependencies || {})),
@@ -239,10 +282,29 @@ const configure = function (pkg, options) {
   }
 }
 
+/**
+ * @param {string} file
+ * @returns {boolean}
+ */
 const isNotRelative = (file) => isRelative(file) && file[0] !== '.'
 
+/**
+ * @param {string} basePath
+ * @param {string} targetPath
+ * @returns {string}
+ */
 const joinAndResolvePath = (basePath, targetPath) => path.resolve(path.join(basePath, targetPath))
 
+/**
+ * @typedef ResolveDefaultEntriesPathsOptions
+ * @property {string} path
+ * @property {import('type-fest').PackageJson} package
+ */
+
+/**
+ * @param {ResolveDefaultEntriesPathsOptions} opts
+ * @returns {Promise<string[]>}
+ */
 const resolveDefaultEntriesPaths = async function (opts) {
   const pkgPath = opts.path
   const pkgDir = path.dirname(pkgPath)
@@ -272,6 +334,18 @@ const resolveDefaultEntriesPaths = async function (opts) {
   return paths
 }
 
+/**
+ * @typedef ResolvePathsOptions
+ * @property {string} path
+ * @property {import('type-fest').PackageJson} package
+ * @property {undefined|boolean} noDefaultEntries
+ * @property {undefined|string[]} entries
+ */
+
+/**
+ * @param {ResolvePathsOptions} opts
+ * @returns {Promise<string[]>}
+ */
 const resolvePaths = async function (opts) {
   const [
     defaultEntries,
@@ -287,6 +361,14 @@ const resolvePaths = async function (opts) {
   ]
 }
 
+/** @typedef {{ deps: Set<string>, seen: Set<string>, core: Set<string> }} DependencyContext */
+
+/**
+ * @param {string} file
+ * @param {Extensions} extensions
+ * @param {DependencyContext} context
+ * @returns {Promise<void>}
+ */
 const getDeps = async function (file, extensions, { deps, seen, core }) {
   const ext = path.extname(file)
   const detective = extensions[ext] || extensions['.js']
@@ -306,18 +388,16 @@ const getDeps = async function (file, extensions, { deps, seen, core }) {
       if (req[0] !== '@' && req.includes('/')) req = req.split('/')[0]
       else if (req[0] === '@') req = req.split('/').slice(0, 2).join('/')
       debug('require("' + req + '")' + ' is a dependency')
-      deps[req] = true
+      deps.add(req)
     } else {
       if (isCore) {
         debug('require("' + req + '")' + ' is core')
-        if (!core.includes(req)) {
-          core.push(req)
-        }
+        core.add(req)
       } else {
         debug('require("' + req + '")' + ' is relative')
         req = path.resolve(path.dirname(file), req)
-        if (!seen.includes(req)) {
-          seen.push(req)
+        if (!seen.has(req)) {
+          seen.add(req)
           relatives.push(req)
         }
       }
@@ -325,14 +405,16 @@ const getDeps = async function (file, extensions, { deps, seen, core }) {
   }
 
   await Promise.all(relatives.map(name => resolveDep(name, extensions, { deps, seen, core })))
-
-  return deps
 }
 
+/**
+ * @param {string} file
+ * @param {Extensions} extensions
+ * @param {DependencyContext} context
+ * @returns {Promise<void>}
+ */
 const resolveDep = async function (file, extensions, { deps, seen, core }) {
-  if (isNotRelative(file)) {
-    return []
-  }
+  if (isNotRelative(file)) return
 
   const resolvedPath = await promisedResolveModule(file, {
     basedir: path.dirname(file),
@@ -342,16 +424,49 @@ const resolveDep = async function (file, extensions, { deps, seen, core }) {
   return getDeps(resolvedPath, extensions, { deps, seen, core })
 }
 
+/**
+ * @typedef ParseOptions
+ * @property {string} path
+ * @property {import('type-fest').PackageJson} package
+ * @property {Extensions} extensions
+ * @property {undefined|boolean} builtins
+ * @property {undefined|boolean} noDefaultEntries
+ * @property {undefined|string[]} entries
+ */
+
+/**
+ * @typedef ParseResult
+ * @property {import('type-fest').PackageJson} package
+ * @property {string[]} used
+ * @property {string[]} [builtins]
+ */
+
+/**
+ * @param {ParseOptions} opts
+ * @returns {Promise<ParseResult>}
+ */
 const parse = async function (opts) {
-  const pkg = opts.package
-  const extensions = opts.extensions
+  const {
+    entries,
+    extensions,
+    noDefaultEntries,
+    'package': pkg,
+    path: basePath,
+  } = opts
 
-  // TODO: Make some of these sets and remove some of them
-  const deps = {}
-  const seen = []
-  const core = []
+  /** @type {Set<string>} */
+  const deps = new Set()
+  /** @type {Set<string>} */
+  const seen = new Set()
+  /** @type {Set<string>} */
+  const core = new Set()
 
-  const paths = await resolvePaths(opts)
+  const paths = await resolvePaths({
+    path: basePath,
+    'package': pkg,
+    entries,
+    noDefaultEntries,
+  })
 
   debug('entry paths', paths)
 
@@ -363,17 +478,13 @@ const parse = async function (opts) {
     lookups.push(resolveDep(file, extensions, { deps, seen, core }))
   }
 
-  const used = new Set()
-  // merge all deps into one unique list
-  for (const deps of await Promise.all(lookups)) {
-    for (const dep in deps) {
-      used.add(dep)
-    }
-  }
+  await Promise.all(lookups)
 
   return {
     'package': pkg,
-    used: [...used],
-    ...(opts.builtins ? { builtins: core } : {})
+    used: [...deps],
+    ...(opts.builtins ? { builtins: [...core] } : {})
   }
 }
+
+module.exports = Object.assign(check, { missing, extra })

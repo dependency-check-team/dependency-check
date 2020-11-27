@@ -39,6 +39,7 @@
     "pkg-up": "^3.1.0",
     "read-package-json": "^3.0.0",
     "resolve": "^1.19.0",
+    "type-fest": "^0.20.2",
     "verror": "^1.10.0"
   },
   "devDependencies": {
