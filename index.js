@@ -24,6 +24,17 @@ const promisedResolveModule = (file, options) => new Promise((resolve, reject) =
   })
 })
 
+/**
+ * @param {string[]} values
+ * @returns {string[]}
+ */
+const unixifyPaths = (values) => values.map(value => unixifyPath(value))
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+const unixifyPath = (value) => value.replace(/\\/g, '/')
+
 /** @typedef {(contents: string) => string[]} Detective */
 /** @typedef {{ [extension: string]: Detective | undefined }} Extensions */
 
@@ -36,12 +47,12 @@ const resolveGlobbedPath = async function (entries, cwd) {
   if (typeof entries === 'string') entries = [entries]
 
   // replace backslashes for forward slashes for windows
-  entries = entries.map(entry => entry.replace(/\\/g, '/'))
+  entries = unixifyPaths(entries)
 
   debug('globby resolving', entries)
 
   const resolvedEntries = await globby(entries, {
-    cwd: cwd.replace(/\\/g, '/'),
+    cwd: unixifyPath(cwd),
     absolute: true,
     expandDirectories: false
   })
@@ -67,6 +78,8 @@ const resolveGlobbedPath = async function (entries, cwd) {
  */
 const resolveModuleTarget = async function (targetPath) {
   let cwd
+
+  targetPath = unixifyPath(targetPath)
 
   if (targetPath.endsWith('/package.json')) {
     cwd = path.dirname(targetPath)
