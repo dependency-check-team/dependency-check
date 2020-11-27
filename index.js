@@ -486,4 +486,8 @@ const parse = async function (opts) {
   }
 }
 
-module.exports = Object.assign(check, { missing, extra })
+module.exports = {
+  check,
+  extra,
+  missing,
+}

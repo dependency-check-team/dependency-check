@@ -17,7 +17,7 @@ if (
   process.exit(0)
 }
 
-const check = require('.')
+const { check, extra, missing } = require('.')
 
 const args = require('minimist')(process.argv.slice(2), {
   'default': {
@@ -130,7 +130,7 @@ check({
     const runAllTests = !args.extra && !args.missing
 
     if (runAllTests || args.unused) {
-      const extras = check.extra(pkg, deps, options)
+      const extras = extra(pkg, deps, options)
       failed += extras.length
       if (extras.length) {
         console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
@@ -146,12 +146,12 @@ check({
           })
         : options
 
-      const missing = check.missing(pkg, deps, optionsForMissingCheck)
+      const result = missing(pkg, deps, optionsForMissingCheck)
 
-      failed += missing.length
+      failed += result.length
 
-      if (missing.length) {
-        console.error('Fail! Dependencies not listed in package.json: ' + missing.join(', '))
+      if (result.length) {
+        console.error('Fail! Dependencies not listed in package.json: ' + result.join(', '))
       } else if (args.verbose) {
         console.log('Success! All dependencies used in the code are listed in package.json')
       }
