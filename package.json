@@ -9,15 +9,15 @@
   "scripts": {
     "check:dependencies": "node cli.js . --no-dev",
     "check:node-versions": "installed-check -i installed-check -i standard",
+    "check:lint": "eslint .",
     "check": "run-p check:*",
-    "lint": "standard",
     "test-cli:custom-detective": "node cli.js test/ -e js:detective-cjs",
     "test-cli:glob": "node cli.js 'test/**/*.js' --no-default-entries",
     "test-cli:multi-glob": "node cli.js test/foo.js 'test/*.js' \"test/donkey/*.js\" --no-default-entries",
     "test-cli:main-as-file": "node cli.js test/index.js",
     "test-cli:simple": "node cli.js test/",
     "test-cli": "run-p test-cli:*",
-    "test": "run-s lint test-cli check"
+    "test": "run-s check test-cli"
   },
   "husky": {
     "hooks": {
@@ -41,11 +41,22 @@
     "verror": "^1.10.0"
   },
   "devDependencies": {
+    "@voxpelli/eslint-config": "9.0.0",
+    "@voxpelli/eslint-config-jsdoc-ts": "^0.3.1",
     "detective-cjs": "^3.0.0",
+    "eslint": "^7.12.1",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-es": "^4.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsdoc": "^30.7.3",
+    "eslint-plugin-mocha": "^8.0.0",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-security": "^1.4.0",
+    "eslint-plugin-unicorn": "^23.0.0",
     "husky": "^4.0.3",
     "installed-check": "^4.0.0-0",
-    "npm-run-all": "^4.1.5",
-    "standard": "^16.0.3"
+    "npm-run-all": "^4.1.5"
   },
   "directories": {
     "test": "test"
