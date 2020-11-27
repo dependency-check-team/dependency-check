@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 
 'use strict'
 
@@ -55,30 +56,7 @@ if (args.help || args._.length === 0) {
 
 // windows leaves leading/trailing quotes on strings needed on unix to
 // stop shells from doing path expansion, so strip them if present
-args._ = args._.map(stripQuotes)
-
-function extensions (arg) {
-  if (!arg) return
-  const extensions = {}
-
-  function add (value) {
-    const parts = value.trim().split(':', 2)
-
-    parts[0].split(',').forEach(function (ext) {
-      extensions[ext.charAt(0) === '.' ? ext : '.' + ext] = parts[1]
-    })
-  }
-
-  if (typeof arg === 'string') {
-    add(arg)
-  } else {
-    arg.forEach(add)
-  }
-
-  return extensions
-}
-
-function stripQuotes (string) {
+args._ = args._.map((string) => {
   if (string.startsWith("'") || string.startsWith('"')) {
     string = string.slice(1)
   }
@@ -88,6 +66,26 @@ function stripQuotes (string) {
   }
 
   return string
+})
+
+const extensions = function (arg) {
+  if (!arg) return
+
+  const extensions = {}
+
+  if (typeof arg === 'string') {
+    arg = [arg]
+  }
+
+  for (const value of arg) {
+    const parts = value.trim().split(':', 2)
+
+    parts[0].split(',').forEach(function (ext) {
+      extensions[ext.charAt(0) === '.' ? ext : '.' + ext] = parts[1]
+    })
+  }
+
+  return extensions
 }
 
 check({
@@ -141,6 +139,7 @@ check({
         console.log('Success! All dependencies used in the code are listed in package.json')
       }
     }
+    // eslint-disable-next-line promise/always-return
     process.exit(args.ignore || !failed ? 0 : 1)
   })
   .catch(err => {
