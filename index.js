@@ -41,7 +41,7 @@ const resolveGlobbedPath = async function (entries, cwd) {
   debug('globby resolving', entries)
 
   const resolvedEntries = await globby(entries, {
-    cwd,
+    cwd: cwd.replace(/\\/g, '/'),
     absolute: true,
     expandDirectories: false
   })
