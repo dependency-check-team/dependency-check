@@ -11,6 +11,8 @@ checks which modules you have used in your code and then makes sure they are lis
 
 ## requirements for maintained majors
 
+dependency-check `5.x` supports Node.js 12 and later
+
 dependency-check `4.x` supports Node.js 10 and later
 
 dependency-check `3.x` supports Node.js 6 and later
@@ -57,7 +59,7 @@ $ dependency-check ./test/**/*.js ./lib/*.js
 
 To always exit with code 0 pass `--ignore`
 
-### --missing 
+### --missing
 
 running `dependency-check ./package.json --missing` will only do the check to make sure that all modules in your code are listed in your package.json
 
