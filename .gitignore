@@ -1,5 +1,13 @@
+# Basic ones
 .DS_Store
-node_modules
+/node_modules
+/*.tgz
+
+# We're a library, so please, no lock files
 /package-lock.json
 /yarn.lock
-/*.tgz
+
+# Generated types
+*.d.ts
+
+# Library specific ones

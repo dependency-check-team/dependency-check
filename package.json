@@ -2,16 +2,30 @@
   "name": "dependency-check",
   "version": "4.1.0",
   "description": "checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json",
-  "main": "index.js",
   "bin": {
     "dependency-check": "cli.js"
   },
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "cli.js",
+    "cli.d.ts",
+    "index.js",
+    "index.d.ts"
+  ],
   "scripts": {
+    "build:0": "run-s clean",
+    "build:1-declaration": "tsc -p declaration.tsconfig.json",
+    "build": "run-s build:*",
     "check:dependencies": "node cli.js . --no-dev -i type-fest",
     "check:node-versions": "installed-check -i installed-check -i standard",
     "check:lint": "eslint .",
     "check:tsc": "tsc",
-    "check": "run-p check:*",
+    "check:type-coverage": "type-coverage --detail --strict --at-least 100",
+    "check": "run-s clean && run-p -c --aggregate-output check:*",
+    "clean:declarations": "rm -rf $(find . -maxdepth 2 -type f -name '*.d.ts')",
+    "clean": "run-p clean:*",
+    "prepublishOnly": "run-s build",
     "test-cli:custom-detective": "node cli.js test/ -e js:detective-cjs",
     "test-cli:glob": "node cli.js 'test/**/*.js' --no-default-entries",
     "test-cli:multi-glob": "node cli.js test/foo.js 'test/*.js' \"test/donkey/*.js\" --no-default-entries",
