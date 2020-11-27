@@ -7,7 +7,7 @@
     "dependency-check": "cli.js"
   },
   "scripts": {
-    "check:dependencies": "node cli.js . --no-dev",
+    "check:dependencies": "node cli.js . --no-dev -i type-fest",
     "check:node-versions": "installed-check -i installed-check -i standard",
     "check:lint": "eslint .",
     "check:tsc": "tsc",
@@ -37,7 +37,7 @@
     "micromatch": "^4.0.2",
     "minimist": "^1.2.0",
     "pkg-up": "^3.1.0",
-    "read-package-json": "^3.0.0",
+    "read-pkg": "^5.2.0",
     "resolve": "^1.19.0",
     "type-fest": "^0.20.2",
     "verror": "^1.10.0"

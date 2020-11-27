@@ -5,9 +5,7 @@ const {
   access: promisedFsAccess,
   readFile
 } = require('fs').promises
-const { promisify } = require('util')
-// @ts-ignore
-const readPackage = require('read-package-json')
+const readPkg = require('read-pkg')
 const builtins = require('module').builtinModules
 const resolveModule = require('resolve')
 const debug = require('debug')('dependency-check')
@@ -17,12 +15,11 @@ const micromatch = require('micromatch')
 const pkgUp = require('pkg-up')
 const VError = require('verror')
 
-const promisedReadPackage = promisify(readPackage)
-
 /** @type {(file: string, options: import('resolve').AsyncOpts) => Promise<string>} */
 const promisedResolveModule = (file, options) => new Promise((resolve, reject) => {
   resolveModule(file, options, (err, path) => {
     if (err) return reject(err)
+    if (path === undefined) return reject(new Error('Could not resolve a module path'))
     resolve(path)
   })
 })
@@ -69,28 +66,31 @@ const resolveGlobbedPath = async function (entries, cwd) {
  * @returns {Promise<undefined|{ pkgPath: string, pkg: import('type-fest').PackageJson, targetEntries?: never}>}
  */
 const resolveModuleTarget = async function (targetPath) {
-  let pkgPath, pkg
+  let cwd
 
-  try {
-    pkg = await promisedReadPackage(targetPath)
-    pkgPath = targetPath
-  } catch (err) {
-    if (targetPath.endsWith('/package.json') || targetPath === 'package.json') {
-      throw new Error('Failed to read package.json: ' + err.message)
-    }
-
-    if (err && err.code === 'EISDIR') {
-      // We were given a path to a module folder
-      pkgPath = path.join(targetPath, 'package.json')
-      pkg = await promisedReadPackage(pkgPath)
-    }
+  if (targetPath.endsWith('/package.json')) {
+    cwd = path.dirname(targetPath)
+  } else if (targetPath === 'package.json') {
+    cwd = process.cwd()
+  } else {
+    cwd = targetPath
   }
 
-  if (!pkg || !pkgPath) return
+  try {
+    const pkg = await readPkg({ cwd })
+    const pkgPath = path.join(cwd, 'package.json')
 
-  return {
-    pkgPath,
-    pkg
+    return {
+      pkgPath,
+      pkg
+    }
+  } catch (err) {
+    if (targetPath.endsWith('/package.json') || targetPath === 'package.json') {
+      throw new VError(err, 'Failed to read package.json')
+    }
+    // Else just fail silently so we can fall back to next lookup method
+    // eslint-disable-next-line no-useless-return
+    return
   }
 }
 
@@ -109,13 +109,12 @@ const resolveEntryTarget = async function (targetPath) {
 
   const pkgPath = await pkgUp({ cwd: path.dirname(targetEntries[0]) })
 
-  const pkg = pkgPath && await promisedReadPackage(pkgPath)
+  const resolved = pkgPath && await resolveModuleTarget(pkgPath)
 
-  if (!pkg || !pkgPath) return
+  if (!resolved) return
 
   return {
-    pkgPath,
-    pkg,
+    ...resolved,
     targetEntries
   }
 }
