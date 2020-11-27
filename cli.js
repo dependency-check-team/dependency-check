@@ -4,10 +4,15 @@
 'use strict'
 
 const debug = require('debug')('dependency-check')
-const requiredNodeEngineMinimum = Number.parseInt(require('./package.json').engines.node.match(/^>=(\d+)\./)[1], 10)
-const currentNodeEngine = Number.parseInt(process.version.match(/^v(\d+)\./)[1], 10)
 
-if (currentNodeEngine < requiredNodeEngineMinimum) {
+// Check that we're at a supported version
+const requiredNodeEngineMinimum = require('./package.json').engines.node.match(/^>=(\d+)\./)
+const currentNodeEngine = process.version.match(/^v(\d+)\./)
+if (
+  !currentNodeEngine ||
+  !requiredNodeEngineMinimum ||
+  Number.parseInt(currentNodeEngine[1], 10) < Number.parseInt(requiredNodeEngineMinimum[1], 10)
+) {
   console.error('dependency-check: Node ' + requiredNodeEngineMinimum + ' or greater is required. `dependency-check` did not run.')
   process.exit(0)
 }
