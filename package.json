@@ -37,7 +37,8 @@
     "minimist": "^1.2.0",
     "pkg-up": "^3.1.0",
     "read-package-json": "^3.0.0",
-    "resolve": "^1.19.0"
+    "resolve": "^1.19.0",
+    "verror": "^1.10.0"
   },
   "devDependencies": {
     "detective-cjs": "^3.0.0",

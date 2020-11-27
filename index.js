@@ -14,6 +14,7 @@ const isRelative = require('is-relative')
 const globby = require('globby')
 const micromatch = require('micromatch')
 const pkgUp = require('pkg-up')
+const VError = require('verror')
 
 const promisedReadPackage = promisify(readPackage)
 const promisedResolveModule = (file, options) => new Promise((resolve, reject) => {
@@ -164,7 +165,9 @@ function getDetective (name) {
     return name
       ? (typeof name === 'string' ? require(name) : name)
       : require('detective')
-  } catch (e) {}
+  } catch (e) {
+    throw new VError(e, 'Failed to load detective \'%s\'', name)
+  }
 }
 
 function noopDetective () {
