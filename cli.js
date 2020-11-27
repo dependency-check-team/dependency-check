@@ -2,6 +2,7 @@
 
 'use strict'
 
+const debug = require('debug')('dependency-check')
 const requiredNodeEngineMinimum = parseInt(require('./package.json').engines.node.match(/^>=(\d+)\./)[1], 10)
 const currentNodeEngine = parseInt(process.version.match(/^v(\d+)\./)[1], 10)
 
@@ -96,6 +97,11 @@ check({
   extensions: extensions(args.e),
   detective: args.detective
 })
+  .catch(err => {
+    console.error('An unexpected error in initial stage:', err.message)
+    debug(err.stack)
+    process.exit(1)
+  })
   .then(data => {
     const pkg = data.package
     const deps = data.used
@@ -138,6 +144,7 @@ check({
     process.exit(args.ignore || !failed ? 0 : 1)
   })
   .catch(err => {
-    console.error(err.message)
+    console.error('An unexpected error happened:', err.message)
+    debug(err.stack)
     process.exit(1)
   })
