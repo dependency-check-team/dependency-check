@@ -72,7 +72,7 @@ async function resolveModuleTarget (targetPath) {
     }
   }
 
-  if (!pkg) return undefined
+  if (!pkg) return
 
   return {
     pkgPath,
@@ -129,7 +129,7 @@ module.exports = async function ({
     entries,
     extensions,
     noDefaultEntries,
-    package: pkg,
+    'package': pkg,
     path: pkgPath
   })
 }
@@ -165,8 +165,8 @@ function getDetective (name) {
     return name
       ? (typeof name === 'string' ? require(name) : name)
       : require('detective')
-  } catch (e) {
-    throw new VError(e, 'Failed to load detective \'%s\'', name)
+  } catch (err) {
+    throw new VError(err, 'Failed to load detective \'%s\'', name)
   }
 }
 
@@ -241,7 +241,7 @@ async function resolveDefaultEntriesPaths (opts) {
   try {
     await promisedFsAccess(mainPath)
     paths.push(mainPath)
-  } catch (err) {}
+  } catch {}
 
   // Add the path of binaries
   if (pkg.bin) {
@@ -297,8 +297,8 @@ async function parse (opts) {
   }
 
   return {
-    package: pkg,
-    used: Array.from(used),
+    'package': pkg,
+    used: [...used],
     ...(opts.builtins ? { builtins: core } : {})
   }
 

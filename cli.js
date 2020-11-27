@@ -3,25 +3,25 @@
 'use strict'
 
 const debug = require('debug')('dependency-check')
-const requiredNodeEngineMinimum = parseInt(require('./package.json').engines.node.match(/^>=(\d+)\./)[1], 10)
-const currentNodeEngine = parseInt(process.version.match(/^v(\d+)\./)[1], 10)
+const requiredNodeEngineMinimum = Number.parseInt(require('./package.json').engines.node.match(/^>=(\d+)\./)[1], 10)
+const currentNodeEngine = Number.parseInt(process.version.match(/^v(\d+)\./)[1], 10)
 
 if (currentNodeEngine < requiredNodeEngineMinimum) {
   console.error('dependency-check: Node ' + requiredNodeEngineMinimum + ' or greater is required. `dependency-check` did not run.')
   process.exit(0)
 }
 
-const check = require('./')
+const check = require('.')
 
 const args = require('minimist')(process.argv.slice(2), {
-  default: {
+  'default': {
     missing: false,
     unused: false,
     dev: true,
     'default-entries': true,
     verbose: false
   },
-  boolean: ['missing', 'unused', 'dev', 'version', 'ignore', 'default-entries', 'verbose'],
+  'boolean': ['missing', 'unused', 'dev', 'version', 'ignore', 'default-entries', 'verbose'],
   alias: {
     'ignore-module': 'i',
     extensions: 'e'
@@ -58,7 +58,7 @@ if (args.help || args._.length === 0) {
 args._ = args._.map(stripQuotes)
 
 function extensions (arg) {
-  if (!arg) return undefined
+  if (!arg) return
   const extensions = {}
 
   function add (value) {
