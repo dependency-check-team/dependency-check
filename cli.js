@@ -73,9 +73,14 @@ args._ = args._.map((string) => {
   return string
 })
 
+/**
+ * @param {*} arg
+ * @returns {import('.').Extensions}
+ */
 const extensions = function (arg) {
-  if (!arg) return
+  if (!arg) return {}
 
+  /** @type {import('.').Extensions} */
   const extensions = {}
 
   if (typeof arg === 'string') {
@@ -85,16 +90,23 @@ const extensions = function (arg) {
   for (const value of arg) {
     const parts = value.trim().split(':', 2)
 
-    parts[0].split(',').forEach(function (ext) {
+    for (const ext of parts[0].split(',')) {
       extensions[ext.charAt(0) === '.' ? ext : '.' + ext] = parts[1]
-    })
+    }
   }
 
   return extensions
 }
 
+const path = args._.shift()
+
+if (!path) {
+  console.error('Requires a path')
+  process.exit(1)
+}
+
 check({
-  path: args._.shift(),
+  path,
   entries: args._,
   noDefaultEntries: !args['default-entries'],
   extensions: extensions(args.e),

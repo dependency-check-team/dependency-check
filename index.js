@@ -24,6 +24,9 @@ const promisedResolveModule = (file, options) => new Promise((resolve, reject) =
   })
 })
 
+/** @typedef {() => string[]} Detective */
+/** @typedef {string[]|{ [extension: string]: Detective | undefined }} Extensions */
+
 const resolveGlobbedPath = async function (entries, cwd) {
   if (typeof entries === 'string') entries = [entries]
 
@@ -104,7 +107,22 @@ const resolveEntryTarget = async function (targetPath) {
   }
 }
 
-module.exports = async function ({
+/**
+ * @typedef ParseOptions
+ * @property {string} path
+ * @property {string[]} [entries]
+ * @property {boolean} [noDefaultEntries]
+ * @property {Extensions} [extensions]
+ * @property {Detective|string} [detective]
+ * @property {boolean} [builtins]
+ */
+
+// FIXME: Define response
+/**
+ * @param {ParseOptions} opts
+ * @returns {Promise<any>}
+ */
+const check = async function ({
   builtins,
   detective,
   entries,
@@ -120,7 +138,7 @@ module.exports = async function ({
     targetEntries
   } = await resolveModuleTarget(targetPath) || await resolveEntryTarget(targetPath)
 
-  entries = targetEntries ? [...targetEntries, ...entries] : entries
+  entries = targetEntries ? [...targetEntries, ...(entries || [])] : entries
   extensions = getExtensions(extensions, detective)
   noDefaultEntries = noDefaultEntries || (targetEntries && targetEntries.length !== 0)
 
@@ -134,7 +152,7 @@ module.exports = async function ({
   })
 }
 
-module.exports.missing = function (pkg, deps, options) {
+const missing = function (pkg, deps, options) {
   const missing = []
   const config = configure(pkg, options)
 
@@ -147,7 +165,7 @@ module.exports.missing = function (pkg, deps, options) {
   return missing
 }
 
-module.exports.extra = function (pkg, deps, options) {
+const extra = function (pkg, deps, options) {
   const missing = []
   const config = configure(pkg, options)
 
@@ -159,6 +177,8 @@ module.exports.extra = function (pkg, deps, options) {
 
   return missing
 }
+
+module.exports = Object.assign(check, { missing, extra })
 
 const getDetective = function (name) {
   try {
