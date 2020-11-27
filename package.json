@@ -21,7 +21,7 @@
     "check:node-versions": "installed-check -i installed-check -i standard",
     "check:lint": "eslint .",
     "check:tsc": "tsc",
-    "check:type-coverage": "type-coverage --detail --strict --at-least 100",
+    "check:type-coverage": "type-coverage --detail --strict --at-least 90",
     "check": "run-s clean && run-p -c --aggregate-output check:*",
     "clean:declarations": "rm -rf $(find . -maxdepth 2 -type f -name '*.d.ts')",
     "clean": "run-p clean:*",
