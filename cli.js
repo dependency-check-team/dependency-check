@@ -25,12 +25,14 @@ const args = require('minimist')(process.argv.slice(2), {
     unused: false,
     dev: true,
     'default-entries': true,
-    verbose: false
+    verbose: false,
+    json: false,
   },
-  'boolean': ['missing', 'unused', 'dev', 'version', 'ignore', 'default-entries', 'verbose'],
+  'boolean': ['missing', 'unused', 'dev', 'version', 'ignore', 'default-entries', 'verbose', 'json'],
   alias: {
     'ignore-module': 'i',
-    extensions: 'e'
+    extensions: 'e',
+    json: 'j',
   }
 })
 
@@ -53,6 +55,7 @@ if (args.help || args._.length === 0) {
   console.log("--extensions, -e      List of file extensions with detective to use when resolving require paths. Eg. 'js,jsx:detective-es6'")
   console.log('--version             Show current version')
   console.log('--ignore              To always exit with code 0 pass --ignore')
+  console.log('--json -j             Format the output as json object')
   console.log('--verbose             Enable logging of eg. success message')
   console.log('')
 
@@ -129,33 +132,43 @@ check({
 
     const runAllTests = !args.extra && !args.missing
 
+    /** @type {string[]} */
+    let extras = []
+    /** @type {string[]} */
+    let result = []
+
     if (runAllTests || args.unused) {
-      const extras = extra(pkg, deps, options)
+      extras = extra(pkg, deps, options)
       failed += extras.length
+    }
+    if (runAllTests || args.missing) {
+      const optionsForMissingCheck = runAllTests
+        ? Object.assign({}, options, {
+          excludeDev: false,
+          excludePeer: false
+        })
+        : options
+
+      result = missing(pkg, deps, optionsForMissingCheck)
+
+      failed += result.length
+    }
+
+    if (args.json) {
+      console.log(JSON.stringify({ missing: result, unused: extras }))
+    } else {
       if (extras.length) {
         console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
       } else if (args.verbose) {
         console.log('Success! All dependencies in package.json are used in the code')
       }
-    }
-    if (runAllTests || args.missing) {
-      const optionsForMissingCheck = runAllTests
-        ? Object.assign({}, options, {
-            excludeDev: false,
-            excludePeer: false
-          })
-        : options
-
-      const result = missing(pkg, deps, optionsForMissingCheck)
-
-      failed += result.length
-
       if (result.length) {
         console.error('Fail! Dependencies not listed in package.json: ' + result.join(', '))
       } else if (args.verbose) {
         console.log('Success! All dependencies used in the code are listed in package.json')
       }
     }
+
     // eslint-disable-next-line promise/always-return
     process.exit(args.ignore || !failed ? 0 : 1)
   })
