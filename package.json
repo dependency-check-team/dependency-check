@@ -51,7 +51,7 @@
     "micromatch": "^4.0.2",
     "minimist": "^1.2.0",
     "pkg-up": "^3.1.0",
-    "read-pkg": "^5.2.0",
+    "read-pkg": "^6.0.0",
     "resolve": "^1.19.0",
     "type-fest": "^1.2.1",
     "verror": "^1.10.0"
