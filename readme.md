@@ -91,9 +91,13 @@ running `dependency-check ./package.json -e js,jsx:precinct` will resolve requir
 
 running `dependency-check ./package.json --detective precinct` will `require()` the local `precinct` as the default parser. This can be set per-extension using using `-e`. Defaults to parsing with [`detective`](https://www.npmjs.com/package/detective).
 
+### --json, -j
+
+formats the output as a json object
+
 ### --verbose
 
-Running with `--verbose` will enable a log message on success, otherwise dependency-check only logs on failure.
+running with `--verbose` will enable a log message on success, otherwise dependency-check only logs on failure.
 
 ### --help
 
