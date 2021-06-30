@@ -132,10 +132,10 @@ check({
 
     const runAllTests = !args.extra && !args.missing
 
-    /** @type {string[]} */
-    let extras = []
-    /** @type {string[]} */
-    let result = []
+    /** @type {string[]|undefined} */
+    let extras
+    /** @type {string[]|undefined} */
+    let result
 
     if (runAllTests || args.unused) {
       extras = extra(pkg, deps, options)
@@ -144,9 +144,9 @@ check({
     if (runAllTests || args.missing) {
       const optionsForMissingCheck = runAllTests
         ? Object.assign({}, options, {
-          excludeDev: false,
-          excludePeer: false
-        })
+            excludeDev: false,
+            excludePeer: false
+          })
         : options
 
       result = missing(pkg, deps, optionsForMissingCheck)
@@ -156,12 +156,18 @@ check({
 
     if (args.json) {
       console.log(JSON.stringify({ missing: result, unused: extras }))
-    } else {
+      // eslint-disable-next-line promise/always-return
+      process.exit(args.ignore || !failed ? 0 : 1)
+    }
+
+    if (extras) {
       if (extras.length) {
         console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
       } else if (args.verbose) {
         console.log('Success! All dependencies in package.json are used in the code')
       }
+    }
+    if (result) {
       if (result.length) {
         console.error('Fail! Dependencies not listed in package.json: ' + result.join(', '))
       } else if (args.verbose) {
