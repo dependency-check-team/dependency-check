@@ -127,6 +127,7 @@ check({
     const options = {
       excludeDev: args.dev === false,
       excludePeer: args.peer === false,
+      // eslint-disable-next-line unicorn/prefer-spread
       ignore: [].concat(args.i || [])
     }
 
@@ -144,9 +145,9 @@ check({
     if (runAllTests || args.missing) {
       const optionsForMissingCheck = runAllTests
         ? Object.assign({}, options, {
-            excludeDev: false,
-            excludePeer: false
-          })
+          excludeDev: false,
+          excludePeer: false
+        })
         : options
 
       result = missing(pkg, deps, optionsForMissingCheck)
