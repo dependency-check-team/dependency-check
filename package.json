@@ -62,7 +62,7 @@
     "@types/is-relative": "^1.0.0",
     "@types/micromatch": "^4.0.1",
     "@types/minimist": "^1.2.1",
-    "@types/node": "^14.14.10",
+    "@types/node": "^16.3.1",
     "@types/resolve": "^1.20.0",
     "@types/verror": "^1.10.4",
     "@voxpelli/eslint-config": "^11.0.1",
