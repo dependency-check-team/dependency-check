@@ -46,7 +46,7 @@
   "dependencies": {
     "debug": "^4.3.1",
     "detective": "^5.0.2",
-    "globby": "^11.0.0",
+    "globby": "^12.0.1",
     "is-relative": "^1.0.0",
     "micromatch": "^4.0.2",
     "minimist": "^1.2.0",
