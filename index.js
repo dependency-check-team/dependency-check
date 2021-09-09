@@ -15,6 +15,8 @@ const micromatch = require('micromatch')
 const pkgUp = require('pkg-up')
 const VError = require('verror')
 
+// TODO: Look into avoiding exporting the types for: ResolveDefaultEntriesPathsOptions, ResolvePathsOptions, DependencyContext, ParseOptions
+
 /** @type {(file: string, options: import('resolve').AsyncOpts) => Promise<string>} */
 const promisedResolveModule = (file, options) => new Promise((resolve, reject) => {
   resolveModule(file, options, (err, path) => {
@@ -277,7 +279,6 @@ const getExtensions = function (extensions, detective) {
   result['.cjs'] = result['.cjs'] || getDetective(detective || 'precinct/commonjs')
   result['.ts'] = result['.ts'] || getDetective(detective || 'precinct/ts')
   result['.tsx'] = result['.tsx'] || getDetective(detective || 'precinct/tsx')
-  result['.scss'] = result['.scss'] || getDetective(detective || 'precinct/scss')
   result['.node'] = result['.node'] || noopDetective
   result['.json'] = result['.json'] || noopDetective
 
@@ -361,6 +362,8 @@ const resolveDefaultEntriesPaths = async function (opts) {
     }
   }
 
+  // TODO: Add browser field, styles field, es6 module style ones etc
+
   return paths
 }
 
@@ -401,7 +404,7 @@ const resolvePaths = async function (opts) {
  */
 const getDeps = async function (file, extensions, { deps, seen, core }) {
   const ext = path.extname(file)
-  const detective = extensions[ext] || extensions['.js']
+  const detective = extensions[ext]
 
   if (typeof detective !== 'function') {
     return Promise.reject(new Error('Detective function missing for "' + file + '"'))
