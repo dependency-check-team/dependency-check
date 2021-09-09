@@ -219,11 +219,31 @@ const extra = function (pkg, deps, options) {
  * @returns {Detective}
  */
 const getDetective = function (name) {
+  /** @type {string|undefined} */
+  let precinctType
+
+  // Allows the use of precinct/foo to add a precinct detective with type 'foo' to a custom extension
+  if (typeof name === 'string' && name.startsWith('precinct/')) {
+    precinctType = name.slice('precinct/'.length)
+    name = undefined
+  }
+
   try {
-    return name
+    if (name) {
       // eslint-disable-next-line security/detect-non-literal-require
-      ? (typeof name === 'string' ? require(name) : name)
-      : require('detective')
+      return typeof name === 'string' ? require(name) : name
+    }
+
+    /** @type {(contents: string, options: { type?: string, es6?: { mixedImports: boolean }}) => string[]} */
+    // @ts-ignore There is no declaration for the precinct module
+    const precinct = require('precinct')
+
+    if (!precinctType) throw new Error('Expected a precinctType, but got none')
+
+    return (contents) => precinct(contents, {
+      type: precinctType,
+      es6: precinctType && ['es6', 'commonjs'].includes(precinctType) ? { mixedImports: true } : undefined
+    })
   } catch (err) {
     throw new VError(err, 'Failed to load detective \'%s\'', name)
   }
@@ -238,13 +258,8 @@ const noopDetective = () => []
  * @returns {Extensions}
  */
 const getExtensions = function (extensions, detective) {
-  // Initialize extensions with node.js default handlers.
   /** @type {Extensions} */
-  const result = {
-    '.js': noopDetective,
-    '.node': noopDetective,
-    '.json': noopDetective
-  }
+  const result = {}
 
   if (Array.isArray(extensions)) {
     for (const extension of extensions) {
@@ -256,12 +271,15 @@ const getExtensions = function (extensions, detective) {
     }
   }
 
-  // Reset the `detective` instance for `.js` when it hasn't been set. This is
-  // done to defer loading detective when not needed and to keep `.js` first in
-  // the order of `Object.keys` (matching node.js behavior).
-  if (result['.js'] === noopDetective) {
-    result['.js'] = getDetective(detective)
-  }
+  result['.js'] = result['.js'] || getDetective(detective || 'precinct/es6')
+  result['.jsx'] = result['.jsx'] || getDetective(detective || 'precinct/es6')
+  result['.mjs'] = result['.mjs'] || getDetective(detective || 'precinct/es6')
+  result['.cjs'] = result['.cjs'] || getDetective(detective || 'precinct/commonjs')
+  result['.ts'] = result['.ts'] || getDetective(detective || 'precinct/ts')
+  result['.tsx'] = result['.tsx'] || getDetective(detective || 'precinct/tsx')
+  result['.scss'] = result['.scss'] || getDetective(detective || 'precinct/scss')
+  result['.node'] = result['.node'] || noopDetective
+  result['.json'] = result['.json'] || noopDetective
 
   return result
 }
