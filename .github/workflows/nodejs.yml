@@ -1,14 +1,13 @@
 env: {}
 
-# FILE GENERATED WITH: npx ghat voxpelli/ghatemplates/lint
+# FILE GENERATED WITH: npx ghat voxpelli/ghatemplates/nodejs
 # SOURCE: https://github.com/voxpelli/ghatemplates
+# OPTIONS: {"set":["jobs.test.strategy.matrix.node_version=[14,16]"]}
 
-name: Linting
-
+name: Node CI
 on:
   - push
   - pull_request
-
 jobs:
   test:
     name: Node ${{ matrix.node_version }} on ${{ matrix.os }}
@@ -16,8 +15,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_version: [14]
-        os: [ubuntu-latest]
+        node_version:
+          - 14
+          - 16
+        os:
+          - ubuntu-latest
+          - windows-latest
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node_version }}
@@ -31,8 +34,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json', '**/package.json') }}
+          key: >-
+            ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json',
+            '**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
       - run: npm install
-      - run: npm run check
+      - run: npm run test-ci
