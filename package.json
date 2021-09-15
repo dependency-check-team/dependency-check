@@ -55,7 +55,7 @@
     "pkg-up": "^3.1.0",
     "pony-cause": "^1.0.0",
     "precinct": "^8.1.0",
-    "read-pkg": "^5.2.0",
+    "read-pkg": "^7.0.0",
     "resolve": "^1.19.0"
   },
   "devDependencies": {
