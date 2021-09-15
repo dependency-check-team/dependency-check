@@ -129,5 +129,5 @@ See [grunt-dependency-check](https://github.com/sindresorhus/grunt-dependency-ch
 
 ## protips
 
-- [detective](https://www.npmjs.org/package/detective) is used for parsing `require()` statements, which means it only does **static requires**. this means you should convert things like `var foo = "bar"; require(foo)` to be static, e.g. `require("bar")`
+- [detective](https://www.npmjs.org/package/detective)-style packages are used for parsing `require()` statements, which means it only does **static requires**. this means you should convert things like `var foo = "bar"; require(foo)` to be static, e.g. `require("bar")`
 - use globbing to effectively add all the files you want to check
