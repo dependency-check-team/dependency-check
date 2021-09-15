@@ -13,7 +13,7 @@ const isRelative = require('is-relative')
 const globby = require('globby')
 const micromatch = require('micromatch')
 const pkgUp = require('pkg-up')
-const VError = require('verror')
+const { ErrorWithCause } = require('pony-cause')
 
 // TODO: Look into avoiding exporting the types for: ResolveDefaultEntriesPathsOptions, ResolvePathsOptions, DependencyContext, ParseOptions
 
@@ -101,7 +101,7 @@ const resolveModuleTarget = async function (targetPath) {
     }
   } catch (err) {
     if (targetPath.endsWith('/package.json') || targetPath === 'package.json') {
-      throw new VError(err, 'Failed to read package.json')
+      throw new ErrorWithCause('Failed to read package.json', { cause: err })
     }
     // Else just fail silently so we can fall back to next lookup method
     // eslint-disable-next-line no-useless-return
@@ -247,7 +247,7 @@ const getDetective = function (name) {
       es6: precinctType && ['es6', 'commonjs'].includes(precinctType) ? { mixedImports: true } : undefined
     })
   } catch (err) {
-    throw new VError(err, 'Failed to load detective \'%s\'', name)
+    throw new ErrorWithCause(`Failed to load detective '${name}'`, { cause: err })
   }
 }
 
@@ -418,7 +418,7 @@ const getDeps = async function (file, extensions, { deps, seen, core }) {
     const isCore = builtins.includes(req)
     if (isNotRelative(req) && !isCore) {
       // require('foo/bar') -> require('foo')
-      if (req[0] !== '@' && req.includes('/')) req = req.split('/')[0]
+      if (req[0] !== '@' && req.includes('/')) req = req.split('/')[0] || ''
       else if (req[0] === '@') req = req.split('/').slice(0, 2).join('/')
       debug('require("' + req + '")' + ' is a dependency')
       deps.add(req)
