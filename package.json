@@ -48,7 +48,7 @@
   "author": "max ogden",
   "dependencies": {
     "debug": "^4.3.1",
-    "globby": "^11.0.0",
+    "globby": "^12.0.2",
     "is-relative": "^1.0.0",
     "micromatch": "^4.0.2",
     "minimist": "^1.2.0",
