@@ -11,7 +11,7 @@ const currentNodeEngine = process.version.match(/^v(\d+)\./)
 if (
   !currentNodeEngine ||
   !requiredNodeEngineMinimum ||
-  Number.parseInt(currentNodeEngine[1], 10) < Number.parseInt(requiredNodeEngineMinimum[1], 10)
+  Number.parseInt(currentNodeEngine[1] || '', 10) < Number.parseInt(requiredNodeEngineMinimum[1] || '', 10)
 ) {
   console.error('dependency-check: Node ' + requiredNodeEngineMinimum + ' or greater is required. `dependency-check` did not run.')
   process.exit(0)
@@ -36,12 +36,12 @@ const args = require('minimist')(process.argv.slice(2), {
   }
 })
 
-if (args.version) {
+if (args['version']) {
   console.log(require('./package.json').version)
   process.exit(1)
 }
 
-if (args.help || args._.length === 0) {
+if (args['help'] || args._.length === 0) {
   console.log('\nUsage: dependency-check <path to entry file, package.json or module folder> <additional entry paths to add> <options>')
   console.log('\nEntry paths supports globbing for easy adding of eg. entire folders.')
   console.log('\nOptions:')
@@ -112,8 +112,8 @@ check({
   path,
   entries: args._,
   noDefaultEntries: !args['default-entries'],
-  extensions: extensions(args.e),
-  detective: args.detective
+  extensions: extensions(args['e']),
+  detective: args['detective']
 })
   .catch(err => {
     console.error('An unexpected error in initial stage:', err.message)
@@ -125,24 +125,23 @@ check({
     const deps = data.used
     let failed = 0
     const options = {
-      excludeDev: args.dev === false,
-      excludePeer: args.peer === false,
-      // eslint-disable-next-line unicorn/prefer-spread
-      ignore: [].concat(args.i || [])
+      excludeDev: args['dev'] === false,
+      excludePeer: args['peer'] === false,
+      ignore: [args['i'] || []].flat()
     }
 
-    const runAllTests = !args.extra && !args.missing
+    const runAllTests = !args['extra'] && !args['missing']
 
     /** @type {string[]|undefined} */
     let extras
     /** @type {string[]|undefined} */
     let result
 
-    if (runAllTests || args.unused) {
+    if (runAllTests || args['unused']) {
       extras = extra(pkg, deps, options)
       failed += extras.length
     }
-    if (runAllTests || args.missing) {
+    if (runAllTests || args['missing']) {
       const optionsForMissingCheck = runAllTests
         ? Object.assign({}, options, {
           excludeDev: false,
@@ -155,29 +154,29 @@ check({
       failed += result.length
     }
 
-    if (args.json) {
+    if (args['json']) {
       console.log(JSON.stringify({ missing: result, unused: extras }))
       // eslint-disable-next-line promise/always-return
-      process.exit(args.ignore || !failed ? 0 : 1)
+      process.exit(args['ignore'] || !failed ? 0 : 1)
     }
 
     if (extras) {
       if (extras.length) {
         console.error('Fail! Modules in package.json not used in code: ' + extras.join(', '))
-      } else if (args.verbose) {
+      } else if (args['verbose']) {
         console.log('Success! All dependencies in package.json are used in the code')
       }
     }
     if (result) {
       if (result.length) {
         console.error('Fail! Dependencies not listed in package.json: ' + result.join(', '))
-      } else if (args.verbose) {
+      } else if (args['verbose']) {
         console.log('Success! All dependencies used in the code are listed in package.json')
       }
     }
 
     // eslint-disable-next-line promise/always-return
-    process.exit(args.ignore || !failed ? 0 : 1)
+    process.exit(args['ignore'] || !failed ? 0 : 1)
   })
   .catch(err => {
     console.error('An unexpected error happened:', err.message)

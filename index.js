@@ -76,7 +76,7 @@ const resolveGlobbedPath = async function (entries, cwd) {
 
 /**
  * @param {string} targetPath
- * @returns {Promise<undefined|{ pkgPath: string, pkg: import('type-fest').PackageJson, targetEntries?: never}>}
+ * @returns {Promise<undefined|{ pkgPath: string, pkg: import('read-pkg').NormalizedPackageJson, targetEntries?: never}>}
  */
 const resolveModuleTarget = async function (targetPath) {
   let cwd
@@ -104,14 +104,12 @@ const resolveModuleTarget = async function (targetPath) {
       throw new ErrorWithCause('Failed to read package.json', { cause: err })
     }
     // Else just fail silently so we can fall back to next lookup method
-    // eslint-disable-next-line no-useless-return
-    return
   }
 }
 
 /**
  * @param {string} targetPath
- * @returns {Promise<undefined|{ pkgPath: string, pkg: import('type-fest').PackageJson, targetEntries: string[]}>}
+ * @returns {Promise<undefined|{ pkgPath: string, pkg: import('read-pkg').NormalizedPackageJson, targetEntries: string[]}>}
  */
 const resolveEntryTarget = async function (targetPath) {
   // We've been given an entry path pattern as the target rather than a package.json or module folder
@@ -179,7 +177,7 @@ const check = async function ({
 }
 
 /**
- * @param {import('type-fest').PackageJson} pkg
+ * @param {import('read-pkg').NormalizedPackageJson} pkg
  * @param {string[]} deps
  * @param {DependencyOptions} [options]
  * @returns {string[]}
@@ -198,7 +196,7 @@ const missing = function (pkg, deps, options) {
 }
 
 /**
- * @param {import('type-fest').PackageJson} pkg
+ * @param {import('read-pkg').NormalizedPackageJson} pkg
  * @param {string[]} deps
  * @param {DependencyOptions} [options]
  * @returns {string[]}
@@ -236,16 +234,16 @@ const getDetective = function (name) {
       return typeof name === 'string' ? require(name) : name
     }
 
-    /** @type {(contents: string, options: { type?: string, es6?: { mixedImports: boolean }}) => string[]} */
+    /** @type {(contents: string, options: { type?: string, es6?: { mixedImports: boolean }|undefined}) => string[]} */
     // @ts-ignore There is no declaration for the precinct module
     const precinct = require('precinct')
 
     if (!precinctType) throw new Error('Expected a precinctType, but got none')
 
-    return (contents) => precinct(contents, {
+    return (contents) => (precinctType && precinct(contents, {
       type: precinctType,
       es6: precinctType && ['es6', 'commonjs'].includes(precinctType) ? { mixedImports: true } : undefined
-    })
+    })) || []
   } catch (err) {
     throw new ErrorWithCause(`Failed to load detective '${name}'`, { cause: err })
   }
@@ -293,7 +291,7 @@ const getExtensions = function (extensions, detective) {
  */
 
 /**
- * @param {import('type-fest').PackageJson} pkg
+ * @param {import('read-pkg').NormalizedPackageJson} pkg
  * @param {DependencyOptions} [options]
  * @returns {{ allDeps: string[], ignore: string[] }}
  */
@@ -329,7 +327,7 @@ const joinAndResolvePath = (basePath, targetPath) => path.resolve(path.join(base
 /**
  * @typedef ResolveDefaultEntriesPathsOptions
  * @property {string} path
- * @property {import('type-fest').PackageJson} package
+ * @property {import('read-pkg').NormalizedPackageJson} package
  */
 
 /**
@@ -370,7 +368,7 @@ const resolveDefaultEntriesPaths = async function (opts) {
 /**
  * @typedef ResolvePathsOptions
  * @property {string} path
- * @property {import('type-fest').PackageJson} package
+ * @property {import('read-pkg').NormalizedPackageJson} package
  * @property {undefined|boolean} noDefaultEntries
  * @property {undefined|string[]} entries
  */
@@ -460,7 +458,7 @@ const resolveDep = async function (file, extensions, { deps, seen, core }) {
 /**
  * @typedef ParseOptions
  * @property {string} path
- * @property {import('type-fest').PackageJson} package
+ * @property {import('read-pkg').NormalizedPackageJson} package
  * @property {Extensions} extensions
  * @property {undefined|boolean} builtins
  * @property {undefined|boolean} noDefaultEntries
@@ -469,7 +467,7 @@ const resolveDep = async function (file, extensions, { deps, seen, core }) {
 
 /**
  * @typedef ParseResult
- * @property {import('type-fest').PackageJson} package
+ * @property {import('read-pkg').NormalizedPackageJson} package
  * @property {string[]} used
  * @property {string[]} [builtins]
  */

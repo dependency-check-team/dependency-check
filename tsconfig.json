@@ -1,28 +1,7 @@
 {
+  "extends": "@voxpelli/tsconfig/node12.json",
   "files": [
     "cli.js",
     "index.js"
-  ],
-  "compilerOptions": {
-    /* Basic Options */
-    "target": "ES2017",
-    "lib": ["ESNext.Array"],
-    "module": "commonjs",
-    "allowJs": true,
-    "checkJs": true,
-    "resolveJsonModule": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-
-    /* Strict Type-Checking Options */
-    "strict": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-
-    /* Additional Checks */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true
-  }
+  ]
 }
