@@ -9,5 +9,6 @@
 
 # Generated types
 *.d.ts
+*.d.ts.map
 
 # Library specific ones

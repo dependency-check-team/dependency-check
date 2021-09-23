@@ -10,8 +10,10 @@
   "files": [
     "cli.js",
     "cli.d.ts",
+    "cli.d.ts.map",
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "index.d.ts.map"
   ],
   "scripts": {
     "build:0": "run-s clean",
