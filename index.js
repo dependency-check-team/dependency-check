@@ -10,7 +10,6 @@ const builtins = require('module').builtinModules
 const resolveModule = require('resolve')
 const debug = require('debug')('dependency-check')
 const isRelative = require('is-relative')
-const globby = require('globby')
 const micromatch = require('micromatch')
 const pkgUp = require('pkg-up')
 const { ErrorWithCause } = require('pony-cause')
@@ -50,6 +49,8 @@ const resolveGlobbedPath = async function (entries, cwd) {
 
   // replace backslashes for forward slashes for windows
   entries = unixifyPaths(entries)
+
+  const { globby } = await import('globby')
 
   debug('globby resolving', entries)
 
