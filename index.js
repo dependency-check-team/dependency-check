@@ -5,7 +5,6 @@ const {
   access: promisedFsAccess,
   readFile
 } = require('fs').promises
-const readPkg = require('read-pkg')
 const builtins = require('module').builtinModules
 const resolveModule = require('resolve')
 const debug = require('debug')('dependency-check')
@@ -92,8 +91,10 @@ const resolveModuleTarget = async function (targetPath) {
     cwd = targetPath
   }
 
+  const { readPackage } = await import('read-pkg')
+
   try {
-    const pkg = await readPkg({ cwd })
+    const pkg = await readPackage({ cwd })
     const pkgPath = path.join(cwd, 'package.json')
 
     return {
