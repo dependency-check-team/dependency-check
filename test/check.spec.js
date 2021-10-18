@@ -124,6 +124,6 @@ describe('check()', () => {
     await check({
       path: 'test/mock-missing-local-file/'
     })
-      .should.be.rejectedWith(Error, `Cannot find module '${process.cwd() + path.sep}test/mock-missing-local-file/not-found.js' from '${process.cwd() + path.sep}test/mock-missing-local-file'`)
+      .should.be.rejectedWith(Error, `Cannot find module '${process.cwd() + path.sep}test${path.sep}mock-missing-local-file${path.sep}not-found.js' from '${process.cwd() + path.sep}test${path.sep}mock-missing-local-file'`)
   })
 })
