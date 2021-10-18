@@ -1,6 +1,6 @@
 {
   "name": "dependency-check",
-  "version": "5.0.0-1",
+  "version": "5.0.0-2",
   "description": "checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json",
   "bin": {
     "dependency-check": "cli.js"
