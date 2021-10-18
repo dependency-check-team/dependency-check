@@ -2,6 +2,8 @@
 .DS_Store
 /node_modules
 /*.tgz
+/coverage
+/.nyc_output
 
 # We're a library, so please, no lock files
 /package-lock.json

@@ -3,5 +3,8 @@
   "files": [
     "cli.js",
     "index.js"
+  ],
+  "include": [
+    "test/*.spec.js"
   ]
 }

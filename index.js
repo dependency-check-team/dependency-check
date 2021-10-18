@@ -148,14 +148,18 @@ const resolveEntryTarget = async function (targetPath) {
  * @param {CheckOptions} opts
  * @returns {Promise<ParseResult>}
  */
-const check = async function ({
-  builtins,
-  detective,
-  entries,
-  extensions,
-  noDefaultEntries,
-  path: targetPath
-}) {
+const check = async function (opts) {
+  if (!opts) throw new TypeError('Requires an opts argument to be set')
+
+  const {
+    builtins,
+    detective,
+    entries,
+    extensions,
+    noDefaultEntries,
+    path: targetPath
+  } = opts
+
   if (!targetPath) throw new Error('Requires a path to be set')
 
   const {
