@@ -8,7 +8,9 @@
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
-    "cli-engine.js",
+    "lib/**/*.js",
+    "lib/**/*.d.ts",
+    "lib/**/*.d.ts.map",
     "cli.js",
     "index.js",
     "index.d.ts",

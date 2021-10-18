@@ -13,7 +13,7 @@ var major = parseInt(match[1] || '', 10)
 var minor = parseInt(match[2] || '', 10)
 
 if (major >= 12 || (major === 12 && minor >= 20)) {
-  require('./cli-engine')
+  require('./lib/cli-engine')
 } else {
   console.error('dependency-check: Node 12.20.0 or greater is required. `dependency-check` did not run.')
   process.exit(0)
