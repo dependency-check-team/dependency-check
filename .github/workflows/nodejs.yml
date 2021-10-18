@@ -6,8 +6,12 @@ env: {}
 
 name: Node CI
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
   test:
     name: Node ${{ matrix.node_version }} on ${{ matrix.os }}
