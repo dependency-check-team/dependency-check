@@ -85,11 +85,11 @@ running eg. `dependency-check package.json tests.js --no-default-entries` won't 
 
 ### --extensions, -e
 
-running `dependency-check ./package.json -e js,jsx:precinct` will resolve require paths to `.js` and `.jsx` paths, and parse using [`precinct`](https://www.npmjs.com/package/precinct).
+running `dependency-check ./package.json -e js,cjs:detective` will resolve require paths to `.js` and `.cjs` paths, and parse using [`detective`](https://www.npmjs.com/package/detective). Specifying any extension will disable the default detectives. Specify just `-e js,cjs` to use the standard detective, `-e foo::` to use ignore the extension, `-e js:precinct/es6` to specify a specific `precinct` setting
 
 ### --detective
 
-running `dependency-check ./package.json --detective precinct` will `require()` the local `precinct` as the default parser. This can be set per-extension using using `-e`. Defaults to parsing with [`detective`](https://www.npmjs.com/package/detective).
+running `dependency-check ./package.json --detective detective` will `require()` the local `detective` as the default parser. This can be set per-extension using using `-e`. Defaults to parsing with [`precinct`](https://www.npmjs.com/package/precinct).
 
 ### --json, -j
 

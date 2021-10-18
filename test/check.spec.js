@@ -8,16 +8,120 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 
 chai.use(chaiAsPromised)
-chai.should()
+const should = chai.should()
 
 const {
   check
 } = require('..')
 
+const {
+  mockPkg,
+  mockUsed
+} = require('./mocks')
+
 describe('check()', () => {
-  it('should throw on invalid input', async () => {
+  it('should throw on missing input', async () => {
     // @ts-ignore
     await check()
-      .should.be.rejectedWith(TypeError, 'Requires an opts argument to be set')
+      .should.be.rejectedWith(Error, 'Requires an opts argument to be set')
+  })
+
+  it('should throw on invalid input', async () => {
+    // @ts-ignore
+    await check({})
+      .should.be.rejectedWith(Error, 'Requires a path to be set')
+  })
+
+  it('should throw on invalid path', async () => {
+    // @ts-ignore
+    await check({ path: true })
+      .should.be.rejectedWith(TypeError, 'Requires path to be a string, got: boolean')
+  })
+
+  it('should throw when finding no package.json', async () => {
+    await check({ path: './yet/another/missing/path' })
+      .should.be.rejectedWith(Error, `Failed to find package.json, path "./yet/another/missing/path" does not resolve to any file for "${process.cwd()}"`)
+  })
+
+  it('should resolve when given given proper input', async () => {
+    const result = await check({ path: 'test/mock-positive/' })
+
+    should.exist(result)
+    result.should.have.property('package').that.deep.equals(mockPkg())
+    result.should.have.property('used').with.members(mockUsed())
+    result.should.not.have.property('builtins')
+  })
+
+  it('should return used builtins when requested', async () => {
+    const result = await check({
+      path: 'test/mock-positive/',
+      builtins: true
+    })
+
+    should.exist(result)
+    result.should.have.property('package').that.deep.equals(mockPkg())
+    result.should.have.property('used').with.members(mockUsed())
+    result.should.have.property('builtins').which.deep.equals(['path'])
+  })
+
+  it('should be able to skip default entries', async () => {
+    const result = await check({
+      path: 'test/mock-positive/',
+      noDefaultEntries: true,
+      entries: ['scoped.js']
+    })
+
+    should.exist(result)
+    result.should.have.property('package').that.deep.equals(mockPkg())
+    result.should.have.property('used').with.members([
+      '@scope/test1',
+      '@scope/test2'
+    ])
+  })
+
+  it('should throw when finding no entries', async () => {
+    await check({
+      path: 'test/mock-positive/',
+      noDefaultEntries: true
+    })
+      .should.be.rejectedWith(Error, 'No entry paths found')
+  })
+
+  it('should add bin files defined in package.json as default entry', async () => {
+    const result = await check({
+      path: './',
+    })
+
+    should.exist(result)
+    result.should.have.nested.property('package.name', 'dependency-check')
+    result.should.have.nested.property('package.bin').which.deep.equals({
+      'dependency-check': 'cli.js'
+    })
+    result.should.have.property('used').which.includes('minimist')
+  })
+
+  it('should handle path simply set to "package.json"', async () => {
+    const result = await check({
+      path: 'package.json',
+    })
+
+    should.exist(result)
+    result.should.have.nested.property('package.name', 'dependency-check')
+  })
+
+  it('should throw when file has no detective', async () => {
+    await check({
+      path: process.cwd(),
+      noDefaultEntries: true,
+      entries: ['readme.md']
+    })
+      .should.be.rejectedWith(Error, `Detective function missing for "${process.cwd()}/readme.md"`)
+  })
+
+  it('should throw when encountering local file that does not exist', async () => {
+    await check({
+      path: 'test/mock-missing-local-file/'
+    })
+      .should.be.rejectedWith(Error, `Cannot find module '${process.cwd()}/test/mock-missing-local-file/not-found.js' from '${process.cwd()}/test/mock-missing-local-file'`)
   })
 })

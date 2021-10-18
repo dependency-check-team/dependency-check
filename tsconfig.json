@@ -5,6 +5,6 @@
     "index.js"
   ],
   "include": [
-    "test/*.spec.js"
+    "test/*.js"
   ]
 }
