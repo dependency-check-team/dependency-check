@@ -4,6 +4,8 @@
 
 'use strict'
 
+const path = require('path')
+
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 
@@ -115,13 +117,13 @@ describe('check()', () => {
       noDefaultEntries: true,
       entries: ['readme.md']
     })
-      .should.be.rejectedWith(Error, `Detective function missing for "${process.cwd()}/readme.md"`)
+      .should.be.rejectedWith(Error, `Detective function missing for "${process.cwd() + path.sep}readme.md"`)
   })
 
   it('should throw when encountering local file that does not exist', async () => {
     await check({
       path: 'test/mock-missing-local-file/'
     })
-      .should.be.rejectedWith(Error, `Cannot find module '${process.cwd()}/test/mock-missing-local-file/not-found.js' from '${process.cwd()}/test/mock-missing-local-file'`)
+      .should.be.rejectedWith(Error, `Cannot find module '${process.cwd() + path.sep}test/mock-missing-local-file/not-found.js' from '${process.cwd() + path.sep}test/mock-missing-local-file'`)
   })
 })
