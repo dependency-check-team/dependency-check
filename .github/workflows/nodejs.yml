@@ -2,7 +2,7 @@ env: {}
 
 # FILE GENERATED WITH: npx ghat voxpelli/ghatemplates/nodejs
 # SOURCE: https://github.com/voxpelli/ghatemplates
-# OPTIONS: {"set":["jobs.test.strategy.matrix.node_version=[14,16]"]}
+# OPTIONS: {"set":["jobs.test.strategy.matrix.node_version=[14,16,17]"]}
 
 name: Node CI
 on:
@@ -22,6 +22,7 @@ jobs:
         node_version:
           - 14
           - 16
+          - 17
         os:
           - ubuntu-latest
           - windows-latest
