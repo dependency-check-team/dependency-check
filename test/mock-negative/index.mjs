@@ -1,4 +1,5 @@
 import http from 'http'
 import path from 'node:path'
+import foobar from 'node:foobar'
 import example from 'example'
 import foo from './foo.js'
