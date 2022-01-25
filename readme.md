@@ -11,13 +11,12 @@ checks which modules you have used in your code and then makes sure they are lis
 
 ## requirements for maintained majors
 
-dependency-check `5.x` supports Node.js 12 and later
+If used on an older Node.js version `dependency-check` will fail silently rather than crashing your tests.
 
-dependency-check `4.x` supports Node.js 10 and later
-
-dependency-check `3.x` supports Node.js 6 and later
-
-dependency-check `2.x` supports Node.js 0.10 and later (Dev note: published using the `legacy` tag)
+* `5.x` supports Node.js 12 and later
+* `4.x` supports Node.js 10 and later
+* `3.x` supports Node.js 6 and later
+* `2.x` supports Node.js 0.10 and later (Dev note: published using the `legacy` tag)
 
 For more info on maintenance status, see [SECURITY.md](./SECURITY.md).
 
