@@ -82,7 +82,6 @@
     "eslint-plugin-jsdoc": "^37.9.4",
     "eslint-plugin-mocha": "^10.0.3",
     "eslint-plugin-n": "^14.0.0",
-    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-security": "^1.4.0",
     "eslint-plugin-unicorn": "^41.0.0",
