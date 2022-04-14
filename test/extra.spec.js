@@ -13,9 +13,9 @@ const {
 } = require('..')
 
 const {
+  mockDevPeerPkg,
   mockPkg,
   mockUsed,
-  mockDevPeerPkg
 } = require('./mocks')
 
 describe('extra()', () => {
