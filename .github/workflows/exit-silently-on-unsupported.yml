@@ -1,10 +1,10 @@
 env: {}
 
-# FILE GENERATED WITH: npx ghat voxpelli/ghatemplates/nodejs
+# FILE GENERATED WITH: npx ghat voxpelli/ghatemplates/exit-silently-on-unsupported
 # SOURCE: https://github.com/voxpelli/ghatemplates
-# OPTIONS: {"set":["jobs.test.strategy.matrix.os=[ubuntu-latest,windows-latest]"]}
+# OPTIONS: {"set":["jobs.test.strategy.matrix.node_version=[0.10.48,12]"]}
 
-name: Node CI
+name: Exit silently on unsupported
 on:
   push:
     branches:
@@ -16,18 +16,20 @@ on:
       - main
 jobs:
   test:
-    name: Node ${{ matrix.node_version }} on ${{ matrix.os }}
+    name: >-
+      ${{ matrix.files }} with Node ${{ matrix.node_version }} on ${{ matrix.os
+      }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         node_version:
-          - 14
-          - 16
-          - 18
+          - 0.10.48
+          - 12
         os:
           - ubuntu-latest
-          - windows-latest
+        files:
+          - ./cli.js
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node_version }}
@@ -48,4 +50,6 @@ jobs:
             ${{ runner.os }}-node-
       - name: npm install
         run: npm install --ignore-scripts
-      - run: npm run test-ci
+      - name: Test that "${{ matrix.files }}" exits silently
+        run: node ${{ matrix.files }}
+        shell: bash
