@@ -2,18 +2,17 @@
 
 checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json, or vice-versa
 
-![Node CI](https://github.com/dependency-check-team/dependency-check/workflows/Node%20CI/badge.svg)
-![Static code analysis](https://github.com/dependency-check-team/dependency-check/workflows/Static%20code%20analysis/badge.svg)
-[![dependencies Status](https://david-dm.org/dependency-check-team/dependency-check/status.svg)](https://david-dm.org/dependency-check-team/dependency-check)
-[![Known Vulnerabilities](https://snyk.io/test/github/dependency-check-team/dependency-check/badge.svg?targetFile=package.json)](https://snyk.io/test/github/dependency-check-team/dependency-check?targetFile=package.json)
+[![Node CI](https://github.com/dependency-check-team/dependency-check/actions/workflows/nodejs.yml/badge.svg)](https://github.com/dependency-check-team/dependency-check/actions/workflows/nodejs.yml)
+[![Linting](https://github.com/dependency-check-team/dependency-check/actions/workflows/lint.yml/badge.svg)](https://github.com/dependency-check-team/dependency-check/actions/workflows/lint.yml)
+[![Exits silently on unsupported](https://github.com/dependency-check-team/dependency-check/actions/workflows/exit-silently-on-unsupported.yml/badge.svg)](https://github.com/dependency-check-team/dependency-check/actions/workflows/exit-silently-on-unsupported.yml)
 
-[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+[![js-standard-style](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
 
 ## requirements for maintained majors
 
 If used on an older Node.js version `dependency-check` will fail silently rather than crashing your tests.
 
-* `5.x` supports Node.js 12 and later
+* `5.x` supports Node.js 14 and later
 * `4.x` supports Node.js 10 and later
 * `3.x` supports Node.js 6 and later
 * `2.x` supports Node.js 0.10 and later (Dev note: published using the `legacy` tag)
