@@ -25,6 +25,7 @@ describe('parse()', () => {
       'package': mockPkg(),
       extensions: {},
       builtins: undefined,
+      ignoreUnknownExtensions: undefined,
       noDefaultEntries: undefined,
       entries: undefined,
     })

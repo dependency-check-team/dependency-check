@@ -77,6 +77,10 @@ running `dependency-check ./package.json --unused --no-peer` will not tell you i
 
 ignores a module. This works for both `--unused` and `--missing`. You can specify as many separate `--ignore-module` arguments as you want. For example running `dependency-check ./package.json --unused --ignore-module foo` will not tell you if the `foo` module was not used in your code.  Supports globbing patterns through the use of [micromatch](https://www.npmjs.com/package/micromatch), so eg. `--ignore-module "@types/*" is possible`
 
+### --ignore-unknown-extensions, -u
+
+won't fail when finding imported files with file extensions that no detectives has been registered for
+
 ### --no-default-entries
 
 running eg. `dependency-check package.json tests.js --no-default-entries` won't add any default entries despite the main path given being one to a package.json or module folder. So only the `tests.js` file will be checked
