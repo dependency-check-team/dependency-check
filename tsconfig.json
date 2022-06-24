@@ -1,13 +1,16 @@
 {
   "extends": "@voxpelli/tsconfig/node14.json",
   "files": [
-    "cli.js",
+    "cli.cjs",
     "index.js"
   ],
   "include": [
+    "lib/*.js",
     "test/*.js"
   ],
   "compilerOptions": {
+    "module": "es2022",
+    "moduleResolution": "node",
     "removeComments": true
   }
 }

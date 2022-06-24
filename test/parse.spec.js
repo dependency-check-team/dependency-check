@@ -2,21 +2,14 @@
 /// <reference types="mocha" />
 /// <reference types="chai" />
 
-'use strict'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
+import { parse } from '../lib/parse.js'
+import { mockPkg } from './mocks.js'
 
 chai.use(chaiAsPromised)
 chai.should()
-
-const {
-  parse
-} = require('../lib/parse')
-
-const {
-  mockPkg
-} = require('./mocks')
 
 describe('parse()', () => {
   it('should throw on missing files', async () => {

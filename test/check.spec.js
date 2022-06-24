@@ -2,24 +2,17 @@
 /// <reference types="mocha" />
 /// <reference types="chai" />
 
-'use strict'
+import { sep } from 'node:path'
 
-const path = require('path')
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
+import { check } from '../index.js'
+import { mockPkg, mockUsed } from './mocks.js'
 
 chai.use(chaiAsPromised)
+
 const should = chai.should()
-
-const {
-  check
-} = require('..')
-
-const {
-  mockPkg,
-  mockUsed
-} = require('./mocks')
 
 describe('check()', () => {
   it('should throw on missing input', async () => {
@@ -97,9 +90,9 @@ describe('check()', () => {
     should.exist(result)
     result.should.have.nested.property('package.name', 'dependency-check')
     result.should.have.nested.property('package.bin').which.deep.equals({
-      'dependency-check': 'cli.js'
+      'dependency-check': 'cli.cjs'
     })
-    result.should.have.property('used').which.includes('minimist')
+    result.should.have.property('used').which.includes('meow')
   })
 
   it('should handle path simply set to "package.json"', async () => {
@@ -117,13 +110,13 @@ describe('check()', () => {
       noDefaultEntries: true,
       entries: ['readme.md']
     })
-      .should.be.rejectedWith(Error, `Detective function missing for "${process.cwd() + path.sep}readme.md"`)
+      .should.be.rejectedWith(Error, `Detective function missing for "${process.cwd() + sep}readme.md"`)
   })
 
   it('should throw when encountering local file that does not exist', async () => {
     await check({
       path: 'test/mock-missing-local-file/'
     })
-      .should.be.rejectedWith(Error, `Cannot find module '${process.cwd() + path.sep}test${path.sep}mock-missing-local-file${path.sep}not-found.js' from '${process.cwd() + path.sep}test${path.sep}mock-missing-local-file'`)
+      .should.be.rejectedWith(Error, `Cannot find module '${process.cwd() + sep}test${sep}mock-missing-local-file${sep}not-found.js' from '${process.cwd() + sep}test${sep}mock-missing-local-file'`)
   })
 })

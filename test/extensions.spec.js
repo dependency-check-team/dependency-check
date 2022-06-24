@@ -3,41 +3,39 @@
 /// <reference types="mocha" />
 /// <reference types="chai" />
 
-'use strict'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 
-const chai = require('chai')
-const { ErrorWithCause } = require('pony-cause')
+import { ErrorWithCause } from 'pony-cause'
+
+import { getExtensions } from '../lib/extensions.js'
+
+chai.use(chaiAsPromised)
 
 const should = chai.should()
-
-const {
-  getExtensions
-} = require('../lib/extensions')
 
 const defaultDetective = () => []
 const specificDetective = () => []
 
 describe('getExtensions()', () => {
-  it('should throw on invalid extensions argument', () => {
-    should.throw(
-      // @ts-ignore
-      () => { getExtensions(true) },
+  it('should throw on invalid extensions argument', async () => {
+    // @ts-ignore
+    await getExtensions(true).should.be.rejectedWith(
       TypeError,
       'Requires extensions argument to be an array or object'
     )
   })
 
-  it('should throw on invalid detective argument', () => {
-    should.throw(
-      // @ts-ignore
-      () => { getExtensions(undefined, true) },
+  it('should throw on invalid detective argument', async () => {
+    // @ts-ignore
+    await getExtensions(undefined, true).should.be.rejectedWith(
       TypeError,
       'Requires detective to be a string or a function'
     )
   })
 
-  it('should return default setup on no input', () => {
-    const result = getExtensions(undefined, undefined)
+  it('should return default setup on no input', async () => {
+    const result = await getExtensions(undefined, undefined)
 
     should.exist(should)
 
@@ -55,8 +53,8 @@ describe('getExtensions()', () => {
     result.should.have.property('.cjs').which.is.a('function')
   })
 
-  it('should only return requested extensions', () => {
-    const result = getExtensions(['.js', '.json'], undefined)
+  it('should only return requested extensions', async () => {
+    const result = await getExtensions(['.js', '.json'], undefined)
 
     should.exist(should)
 
@@ -68,13 +66,13 @@ describe('getExtensions()', () => {
     result.should.have.property('.js').which.is.a('function')
   })
 
-  it('should use provided detectives', () => {
+  it('should use provided detectives', async () => {
     const extensions = {
       '.js': undefined,
       '.json': specificDetective
     }
 
-    const result = getExtensions(extensions, defaultDetective)
+    const result = await getExtensions(extensions, defaultDetective)
 
     should.exist(should)
 
@@ -84,7 +82,7 @@ describe('getExtensions()', () => {
     })
   })
 
-  it('should default to noop-detective for .json and .node', () => {
+  it('should default to noop-detective for .json and .node', async () => {
     const extensions = {
       '.js': specificDetective,
       '.cjs': undefined,
@@ -92,7 +90,7 @@ describe('getExtensions()', () => {
       '.node': undefined
     }
 
-    const result = getExtensions(extensions, defaultDetective)
+    const result = await getExtensions(extensions, defaultDetective)
 
     should.exist(should)
 
@@ -109,14 +107,14 @@ describe('getExtensions()', () => {
     result.should.have.property('.node').which.is.a('function').and.is.not.equal(defaultDetective)
   })
 
-  it('should use named detective', () => {
+  it('should use named detective', async () => {
     const extensions = {
       '.js': undefined,
       '.mjs': undefined,
       '.cjs': 'detective-cjs'
     }
 
-    const result = getExtensions(extensions, defaultDetective)
+    const result = await getExtensions(extensions, defaultDetective)
 
     should.exist(should)
 
@@ -131,17 +129,15 @@ describe('getExtensions()', () => {
     result.should.have.property('.cjs').which.is.a('function').and.is.not.equal(result['.js'])
   })
 
-  it('should throw on missing precinct type', () => {
-    should.throw(
-      () => { getExtensions(undefined, 'precinct/') },
+  it('should throw on missing precinct type', async () => {
+    await getExtensions(undefined, 'precinct/').should.be.rejectedWith(
       Error,
       'Expected a "precinct/something", but got "precinct/"'
     )
   })
 
-  it('should throw on missing detective module', () => {
-    should.throw(
-      () => { getExtensions(undefined, '@dependency-check-team/yet-another-missing-module') },
+  it('should throw on missing detective module', async () => {
+    await getExtensions(undefined, '@dependency-check-team/yet-another-missing-module').should.be.rejectedWith(
       ErrorWithCause,
       "Failed to load detective '@dependency-check-team/yet-another-missing-module'"
     )
