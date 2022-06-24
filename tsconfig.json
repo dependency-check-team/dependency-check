@@ -10,7 +10,6 @@
   ],
   "compilerOptions": {
     "module": "es2022",
-    "moduleResolution": "node",
-    "removeComments": true
+    "moduleResolution": "node"
   }
 }

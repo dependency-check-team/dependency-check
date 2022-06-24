@@ -70,7 +70,7 @@
     "@types/picomatch": "^2.3.0",
     "@types/resolve": "^1.20.2",
     "@voxpelli/eslint-config": "^14.0.4",
-    "@voxpelli/tsconfig": "^3.2.0",
+    "@voxpelli/tsconfig": "^4.0.0",
     "c8": "^7.11.2",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
