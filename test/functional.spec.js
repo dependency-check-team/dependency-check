@@ -2,17 +2,11 @@
 /// <reference types="mocha" />
 /// <reference types="chai" />
 
-'use strict'
+import chai from 'chai'
 
-const chai = require('chai')
+import { check, extra, missing } from '../index.js'
 
 chai.should()
-
-const {
-  check,
-  extra,
-  missing
-} = require('..')
 
 describe('functional', () => {
   it('should correctly handle a simple case', async () => {

@@ -1,10 +1,5 @@
-'use strict'
-
-const { check } = require('./lib/check')
-const { extra, missing } = require('./lib/compare')
-
-module.exports = {
-  check,
-  extra,
-  missing,
-}
+export { check } from './lib/check.js'
+export {
+  findUnused as extra,
+  findMissing as missing
+} from './lib/compare.js'

@@ -1,7 +1,6 @@
-'use strict'
 
 /** @returns {import('read-pkg').NormalizedPackageJson} */
-const mockPkg = () => ({
+export const mockPkg = () => ({
   '_id': 'test@0.0.1',
   'dependencies': {
     '@scope/test1': '*',
@@ -15,7 +14,7 @@ const mockPkg = () => ({
   'version': '0.0.1',
 })
 
-const mockUsed = () => ([
+export const mockUsed = () => ([
   'async',
   'resolve',
   '@scope/test1',
@@ -24,7 +23,7 @@ const mockUsed = () => ([
 ])
 
 /** @returns {import('read-pkg').NormalizedPackageJson} */
-const mockDevPeerPkg = () => ({
+export const mockDevPeerPkg = () => ({
   '_id': 'test@0.0.1',
   'dependencies': {
     '@scope/test1': '*',
@@ -41,9 +40,3 @@ const mockDevPeerPkg = () => ({
   'readme': 'ERROR: No README data found!',
   'version': '0.0.1',
 })
-
-module.exports = {
-  mockPkg,
-  mockUsed,
-  mockDevPeerPkg
-}

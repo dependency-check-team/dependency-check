@@ -2,21 +2,16 @@
 /// <reference types="mocha" />
 /// <reference types="chai" />
 
-'use strict'
+import chai from 'chai'
 
-const chai = require('chai')
-
-const should = chai.should()
-
-const {
-  extra,
-} = require('..')
-
-const {
+import { extra } from '../index.js'
+import {
   mockDevPeerPkg,
   mockPkg,
   mockUsed,
-} = require('./mocks')
+} from './mocks.js'
+
+const should = chai.should()
 
 describe('extra()', () => {
   it('should throw on missing pkg', () => {

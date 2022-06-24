@@ -1,9 +1,3 @@
-env: {}
-
-# FILE GENERATED WITH: npx ghat voxpelli/ghatemplates/exit-silently-on-unsupported
-# SOURCE: https://github.com/voxpelli/ghatemplates
-# OPTIONS: {"set":["jobs.test.strategy.matrix.node_version=[0.10.48,12]"]}
-
 name: Exit silently on unsupported
 on:
   push:
@@ -29,7 +23,7 @@ jobs:
         os:
           - ubuntu-latest
         files:
-          - ./cli.js
+          - ./cli.cjs
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node_version }}

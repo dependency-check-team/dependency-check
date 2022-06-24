@@ -2,6 +2,7 @@
   "extends": "@voxpelli",
   "root": true,
   "rules": {
-    "semi": ["error", "never"]
+    "semi": ["error", "never"],
+    "func-style": ["warn", "declaration", { "allowArrowFunctions": true }]
   }
 }
