@@ -12,5 +12,7 @@
 # Generated types
 *.d.ts
 *.d.ts.map
+*.d.cts
+*.d.cts.map
 
 # Library specific ones
