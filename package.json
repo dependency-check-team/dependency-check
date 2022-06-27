@@ -28,7 +28,7 @@
     "check:tsc": "tsc",
     "check:type-coverage": "type-coverage --detail --strict --at-least 95",
     "check": "run-s clean && run-p -c --aggregate-output check:*",
-    "clean:declarations": "rm -rf $(find . -maxdepth 2 -type f -name '*.d.ts*')",
+    "clean:declarations": "rm -rf $(find . -maxdepth 2 -type f -name '*.d.*ts*')",
     "clean": "run-p clean:*",
     "prepare": "husky install",
     "prepublishOnly": "run-s build",
