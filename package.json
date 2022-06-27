@@ -50,7 +50,7 @@
   "author": "max ogden",
   "dependencies": {
     "debug": "^4.3.1",
-    "globby": "^12.0.2",
+    "globby": "^13.1.2",
     "is-relative": "^1.0.0",
     "meow": "^10.1.3",
     "picomatch": "^2.3.1",
