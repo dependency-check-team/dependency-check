@@ -17,4 +17,5 @@ jobs:
   lint:
     uses: voxpelli/ghatemplates/.github/workflows/exit-silently-on-unsupported.yml@main
     with:
+      files: './cli.cjs'
       node-versions: '0.10.48,12'
