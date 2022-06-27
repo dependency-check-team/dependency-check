@@ -1,4 +1,5 @@
 name: Exit silently on unsupported
+
 on:
   push:
     branches:
@@ -8,42 +9,12 @@ on:
   pull_request:
     branches:
       - main
+
+permissions:
+  contents: read
+
 jobs:
-  test:
-    name: >-
-      ${{ matrix.files }} with Node ${{ matrix.node_version }} on ${{ matrix.os
-      }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        node_version:
-          - 0.10.48
-          - 12
-        os:
-          - ubuntu-latest
-        files:
-          - ./cli.cjs
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node_version }}
-      - name: Get npm cache directory
-        id: npm-cache-dir
-        run: |
-          echo "::set-output name=dir::$(npm config get cache)"
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: >-
-            ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json',
-            '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: npm install
-        run: npm install --ignore-scripts
-      - name: Test that "${{ matrix.files }}" exits silently
-        run: node ${{ matrix.files }}
-        shell: bash
+  lint:
+    uses: voxpelli/ghatemplates/.github/workflows/exit-silently-on-unsupported.yml@main
+    with:
+      node-versions: '0.10.48,12'
