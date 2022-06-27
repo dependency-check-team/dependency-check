@@ -125,10 +125,6 @@ $ npm install --save siblings
 $ npm publish # works this time
 ```
 
-## grunt usage
-
-See [grunt-dependency-check](https://github.com/sindresorhus/grunt-dependency-check).
-
 ## protips
 
 - [detective](https://www.npmjs.org/package/detective)-style packages are used for parsing `require()` statements, which means it only does **static requires**. this means you should convert things like `var foo = "bar"; require(foo)` to be static, e.g. `require("bar")`
