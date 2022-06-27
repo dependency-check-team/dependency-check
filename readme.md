@@ -2,11 +2,9 @@
 
 checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json, or vice-versa
 
-[![Node CI](https://github.com/dependency-check-team/dependency-check/actions/workflows/nodejs.yml/badge.svg)](https://github.com/dependency-check-team/dependency-check/actions/workflows/nodejs.yml)
-[![Linting](https://github.com/dependency-check-team/dependency-check/actions/workflows/lint.yml/badge.svg)](https://github.com/dependency-check-team/dependency-check/actions/workflows/lint.yml)
-[![Exits silently on unsupported](https://github.com/dependency-check-team/dependency-check/actions/workflows/exit-silently-on-unsupported.yml/badge.svg)](https://github.com/dependency-check-team/dependency-check/actions/workflows/exit-silently-on-unsupported.yml)
-
-[![js-standard-style](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![ES Module Ready Badge](https://img.shields.io/badge/es%20module%20ready-yes-success.svg)](https://esmodules.dev/)
+[![Types in JS](https://img.shields.io/badge/types_in_js-yes-brightgreen)](https://github.com/voxpelli/types-in-js)
 
 ## requirements for maintained majors
 
