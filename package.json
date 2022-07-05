@@ -22,7 +22,7 @@
     "build:0": "run-s clean",
     "build:1-declaration": "tsc -p declaration.tsconfig.json",
     "build": "run-s build:*",
-    "check:dependencies": "node cli.cjs . --no-dev",
+    "check:dependencies": "node cli.cjs index.js cli.cjs 'lib/**/*.js' --no-dev",
     "check:node-versions": "installed-check -i precinct -i eslint-plugin-jsdoc",
     "check:lint": "eslint .",
     "check:tsc": "tsc",
@@ -58,7 +58,8 @@
     "pony-cause": "^2.0.0",
     "precinct": "^8.2.0",
     "read-pkg": "^7.0.0",
-    "resolve": "^1.19.0"
+    "resolve": "^1.19.0",
+    "version-guard": "^1.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.1",
