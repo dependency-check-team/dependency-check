@@ -85,6 +85,7 @@ describe('check()', () => {
   it('should add bin files defined in package.json as default entry', async () => {
     const result = await check({
       path: './',
+      entries: ['./lib/cli-engine.js']
     })
 
     should.exist(result)
