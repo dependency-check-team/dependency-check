@@ -24,7 +24,7 @@
     "build": "run-s build:*",
     "check:dependencies": "node cli.cjs index.js cli.cjs 'lib/**/*.js' --no-dev",
     "check:node-versions": "installed-check -i precinct -i eslint-plugin-jsdoc",
-    "check:lint": "eslint .",
+    "check:lint": "eslint --report-unused-disable-directives .",
     "check:tsc": "tsc",
     "check:type-coverage": "type-coverage --detail --strict --at-least 95",
     "check": "run-s clean && run-p -c --aggregate-output check:*",
