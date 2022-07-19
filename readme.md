@@ -2,9 +2,12 @@
 
 checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json, or vice-versa
 
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![npm version](https://img.shields.io/npm/v/dependency-check.svg?style=flat)](https://www.npmjs.com/package/dependency-check)
+[![npm version, next](https://img.shields.io/npm/v/dependency-check/next)](https://www.npmjs.com/package/dependency-check)
+[![npm downloads](https://img.shields.io/npm/dm/dependency-check.svg?style=flat)](https://www.npmjs.com/package/dependency-check)
 [![ES Module Ready Badge](https://img.shields.io/badge/es%20module%20ready-yes-success.svg)](https://esmodules.dev/)
 [![Types in JS](https://img.shields.io/badge/types_in_js-yes-brightgreen)](https://github.com/voxpelli/types-in-js)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## requirements for maintained majors
 
