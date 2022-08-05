@@ -74,7 +74,7 @@
     "c8": "^7.11.2",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
-    "detective-cjs": "^3.0.0",
+    "detective-cjs": "^4.0.0",
     "eslint": "^8.21.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-es": "^4.1.0",
