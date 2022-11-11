@@ -55,7 +55,7 @@
     "picomatch": "^2.3.1",
     "pkg-up": "^4.0.0",
     "pony-cause": "^2.1.4",
-    "precinct": "^8.2.0",
+    "precinct": "^9.0.1",
     "read-pkg": "^7.0.0",
     "resolve": "^1.19.0",
     "version-guard": "^1.1.0"
