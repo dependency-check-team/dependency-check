@@ -66,11 +66,11 @@
     "@types/debug": "^4.1.5",
     "@types/is-relative": "^1.0.0",
     "@types/mocha": "^10.0.0",
-    "@types/node": "^14.18.33",
+    "@types/node": "^14.18.38",
     "@types/picomatch": "^2.3.0",
     "@types/resolve": "^1.20.2",
     "@voxpelli/eslint-config": "^15.2.0",
-    "@voxpelli/tsconfig": "^4.2.0",
+    "@voxpelli/tsconfig": "^7.0.0",
     "c8": "^7.12.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
@@ -90,8 +90,8 @@
     "installed-check": "^6.0.4",
     "mocha": "^10.1.0",
     "npm-run-all2": "^6.0.4",
-    "type-coverage": "^2.23.0",
-    "typescript": "~4.8.0"
+    "type-coverage": "^2.25.0",
+    "typescript": "~5.0.2"
   },
   "directories": {
     "test": "test"
