@@ -1,6 +1,6 @@
 # dependency-check
 
-**Summer 2023: Deprecated in favor of [`knip`](https://github.com/webpro/knip), which is a way more powerful and comprehensive approach**
+**Spring 2024: Deprecated in favor of [`knip`](https://github.com/webpro/knip), which is a way more powerful and comprehensive approach**
 
 checks which modules you have used in your code and then makes sure they are listed as dependencies in your package.json, or vice-versa
 
